@@ -13,96 +13,16 @@
 #include "sps30.h"
 #include "irtransmitter.h"
 #include "samsung_test.h"
+#include "ssd1306.h"
+#include "ssd1306_tests.h"
 
 #define TAG "MAIN.C"
 
 #define I2C_MASTER_PORT I2C_NUM_0
 #define I2C_SDA GPIO_NUM_21
 #define I2C_SCL GPIO_NUM_22
-
-static esp_err_t i2c_master_driver_initialize(void)
-{
-    i2c_config_t i2c_master_config = {
-        .mode = I2C_MODE_MASTER,
-        .sda_io_num = I2C_SDA,
-        .scl_io_num = I2C_SCL,
-        .sda_pullup_en = GPIO_PULLUP_ENABLE,
-        .scl_pullup_en = GPIO_PULLUP_ENABLE,
-        .master.clk_speed = 100000};   
-    return i2c_param_config(I2C_MASTER_PORT, &i2c_master_config);
-}
-
-static uint8_t i2c_slave_knock(uint8_t i2c_port, uint8_t slave_addr)
-{
-    esp_err_t err;
-    i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-    i2c_master_start(cmd);
-    i2c_master_write_byte(cmd, (slave_addr << 1) | I2C_MASTER_WRITE, 1);
-    i2c_master_stop(cmd);
-    err = i2c_master_cmd_begin(i2c_port, cmd, 50 / portTICK_PERIOD_MS);
-    i2c_cmd_link_delete(cmd);
-    return err == ESP_OK;
-}
-
-static void i2c_scan(void *pdata)
-{
-    while (1)
-    {
-        ESP_LOGI(TAG, "Scanning I2C.");
-        i2c_driver_install(I2C_MASTER_PORT, I2C_MODE_MASTER, 0, 0, 0);
-        i2c_master_driver_initialize();
-
-        uint8_t slave_count = 0;
-        uint8_t address;
-
-        printf("     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f\r\n");
-        for (int i = 0; i < 128; i += 16)
-        {
-            printf("%02x: ", i);
-            for (int j = 0; j < 16; j++)
-            {
-                address = i + j;
-                i2c_cmd_handle_t cmd = i2c_cmd_link_create();
-                i2c_master_start(cmd);
-                i2c_master_write_byte(cmd, (address << 1) | I2C_MASTER_WRITE, 1);
-                i2c_master_stop(cmd);
-                esp_err_t ret = i2c_master_cmd_begin(I2C_MASTER_PORT, cmd, 50 / portTICK_RATE_MS);
-                i2c_cmd_link_delete(cmd);
-                if (ret == ESP_OK)
-                {
-                    printf("%02x ", address);
-                    slave_count++;
-                }
-                else if (ret == ESP_ERR_TIMEOUT)
-                {
-                    printf("UU ");
-                }
-                else
-                {
-                    printf("-- ");
-                }
-            }
-            printf("\r\n");
-        }
-
-        ESP_LOGI(TAG, "Slave Count %d", slave_count);
-        i2c_driver_delete(I2C_MASTER_PORT);
-        vTaskDelay(3000 / portTICK_RATE_MS);
-    }
-
-#if 0
-    for (int slave_addr = 0; slave_addr < 127; slave_addr++)
-    {
-        if (i2c_slave_knock(I2C_MASTER_PORT, slave_addr))
-        {
-            // Count the number of slaves
-            ESP_LOGI(TAG, "Slave_%d_addr %02X", slave_count, slave_addr);
-            // Increment count
-            slave_count++;
-        }
-    }
-#endif
-}
+#define DISPLAY_WIDTH 128
+#define DISPLAY_HEIGHT 64
 
 /**
  * @brief       Task for SPS30 to read the measurements from the sensor.
@@ -197,7 +117,54 @@ void sps30_task()
                          m.mc_1p0, m.mc_2p5, m.mc_4p0, m.mc_10p0, m.nc_0p5,
                          m.nc_1p0, m.nc_2p5, m.nc_4p0, m.nc_10p0,
                          m.typical_particle_size);
-                ssd1306_fill(White);
+
+                // char str_sps30_pm1_0_buf[64];
+                // char str_sps30_pm2_5_buf[64];
+                // char str_sps30_pm4_0_buf[64];
+                // char str_sps30_pm10_0_buf[64];
+                // char str_sps30_nc0_5_buf[64];
+                // char str_sps30_nc1_0_buf[64];
+                // char str_sps30_nc2_5_buf[64];
+                // char str_sps30_nc4_0_buf[64];
+                // char str_sps30_nc10_0_buf[64];
+                // char str_sps30_typsize_buf[64];
+
+                // ssd1306_set_cursor(0, 0);
+                // sprintf(str_sps30_nc0_5_buf, "%0.2fnc0.5", m.nc_0p5);
+                // ssd1306_write_string((char *)str_sps30_nc0_5_buf, Font_6x8, White);
+                // ssd1306_set_cursor(0, 10);
+                // sprintf(str_sps30_nc1_0_buf, "%0.2fnc1.0", m.nc_1p0);
+                // ssd1306_write_string((char *)str_sps30_nc1_0_buf, Font_6x8, White);
+                // ssd1306_set_cursor(0, 20);
+                // sprintf(str_sps30_nc2_5_buf, "%0.2fnc2.5", m.nc_2p5);
+                // ssd1306_write_string((char *)str_sps30_nc2_5_buf, Font_6x8, White);
+                // ssd1306_set_cursor(0, 30);
+                // sprintf(str_sps30_nc4_0_buf, "%0.2fnc4.0", m.nc_4p0);
+                // ssd1306_write_string((char *)str_sps30_nc4_0_buf, Font_6x8, White);
+                // ssd1306_set_cursor(0, 40);
+                // sprintf(str_sps30_nc10_0_buf, "%0.2fnc10.0", m.nc_10p0);
+                // ssd1306_write_string((char *)str_sps30_nc10_0_buf, Font_6x8, White);
+                // ssd1306_set_cursor(0, 50);
+                // sprintf(str_sps30_typsize_buf, "%0.2f typ. part. size", m.typical_particle_size);
+                // ssd1306_write_string((char *)str_sps30_typsize_buf, Font_6x8, White);
+                // ssd1306_set_cursor(65, 0);
+                // sprintf(str_sps30_pm1_0_buf, "%.02fpm1.0", m.mc_1p0);
+                // ssd1306_write_string((char *)str_sps30_pm1_0_buf, Font_6x8, White);
+                // ssd1306_set_cursor(65, 10);
+                // sprintf(str_sps30_pm2_5_buf, "%.02fpm2.5", m.mc_2p5);
+                // ssd1306_write_string((char *)str_sps30_pm2_5_buf, Font_6x8, White);
+                // ssd1306_set_cursor(65, 20);
+                // sprintf(str_sps30_pm4_0_buf, "%.02fpm4.0", m.mc_4p0);
+                // ssd1306_write_string((char *)str_sps30_pm4_0_buf, Font_6x8, White);
+                // ssd1306_set_cursor(65, 30);
+                // sprintf(str_sps30_pm10_0_buf, "%.02fpm10.0", m.mc_10p0);
+                // ssd1306_write_string((char *)str_sps30_pm10_0_buf, Font_6x8, White);
+
+                ssd1306_set_cursor(0, 0);
+                #include "font8x8_basic.h"
+                
+
+                ssd1306_update_screen();
             }
             sensirion_sleep_usec(1000000); /* sleep for 1s */
         }
@@ -257,10 +224,21 @@ void run_all_samsung_test()
 
 void app_main(void)
 {
+    i2c_config_t i2c_master_config = {
+        .mode = I2C_MODE_MASTER,
+        .scl_io_num = I2C_SCL,
+        .sda_io_num = I2C_SDA,
+        .scl_pullup_en = true,
+        .sda_pullup_en = true,
+        .master.clk_speed = 100000,
+    };
+    i2c_param_config(SSD1306_I2C_PORT, &i2c_master_config);
+    i2c_driver_install(SSD1306_I2C_PORT, i2c_master_config.mode, 0, 0, 0);
+
     rmt_tx_init(); /* initialize ir peripheral of esp32 */
-    i2c_master_driver_initialize();
+    ssd1306_init();
 
     /*** Task Creation ***/
-    xTaskCreate(&sps30_task, "sps30 task", 1024 * 2, NULL, 2, NULL);
-    xTaskCreate(&run_all_samsung_test, "samsung test", 1024 * 2, NULL, 1, NULL);
+    xTaskCreate(&sps30_task, "sps30 task", 1024 * 4, NULL, 2, NULL);
+    // xTaskCreate(&run_all_samsung_test, "samsung test", 1024 * 2, NULL, 1, NULL);
 }

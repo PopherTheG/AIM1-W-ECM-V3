@@ -59,6 +59,7 @@ $<TARGET_FILE:__idf_ulp>
 $<TARGET_FILE:__idf_unity>
 $<TARGET_FILE:__idf_wifi_provisioning>
 $<TARGET_FILE:__idf_main>
+$<TARGET_FILE:__idf_fonts>
 $<TARGET_FILE:__idf_irtransmitter>
 $<TARGET_FILE:__idf_sps30>
 $<TARGET_FILE:__idf_ssd1306>

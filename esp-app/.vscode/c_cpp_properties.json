@@ -20,6 +20,9 @@
                 "${workspaceFolder}/build/config",
                 "${workspaceFolder}/components/sps30",
                 "${workspaceFolder}/components/irtransmitter",
+                "${workspaceFolder}/components/ssd1306",
+                "${workspaceFolder}/components/fonts",
+                "${workspaceFolder}/components/fonts/data",
                 "${workspaceFolder}/build/bootloader/config",
                 "${IDF_TOOLS}/xtensa-esp32-elf/esp32-2019r1-8.2.0/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/8.2.0/include",
                 "${IDF_TOOLS}/xtensa-esp32-elf/esp32-2019r1-8.2.0/xtensa-esp32-elf/xtensa-esp32-elf/include",
@@ -72,7 +75,9 @@
                 "${IDF_PATH}/components/bt/host/nimble/nimble/nimble/host/services/gap/include",
                 "${IDF_PATH}/components/bt/host/nimble/nimble/nimble/host/services/gatt/include",
                 "C:/esp/tools/.espressif/tools/xtensa-esp32-elf/esp-2020r2-8.2.0/xtensa-esp32-elf/xtensa-esp32-elf/include",
-                "C:/esp/esp-idf/components/esp_ringbuf/include"
+                "C:/esp/esp-idf/components/esp_ringbuf/include",
+                "${workspaceFolder}/components/fonts",
+                "${workspaceFolder}/components/fonts"
             ],
             "defines": [],
             "cStandard": "c11",

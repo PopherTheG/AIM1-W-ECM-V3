@@ -532,6 +532,13 @@ D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/esp-idf/main/CMakeFiles/__idf_mai
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/esp-idf/main/CMakeFiles/rebuild_cache.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/esp-idf/main/CMakeFiles/list_install_components.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/esp-idf/main/CMakeFiles/install/strip.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/esp-idf/fonts/CMakeFiles/install/strip.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/esp-idf/fonts/CMakeFiles/__idf_fonts.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/esp-idf/fonts/CMakeFiles/install/local.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/esp-idf/fonts/CMakeFiles/install.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/esp-idf/fonts/CMakeFiles/edit_cache.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/esp-idf/fonts/CMakeFiles/rebuild_cache.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/esp-idf/fonts/CMakeFiles/list_install_components.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/esp-idf/irtransmitter/CMakeFiles/install/strip.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/esp-idf/irtransmitter/CMakeFiles/__idf_irtransmitter.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/esp-idf/irtransmitter/CMakeFiles/install/local.dir
