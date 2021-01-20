@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "main.h"
 
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
@@ -15,17 +16,97 @@
 #include "samsung_test.h"
 #include "ssd1306.h"
 #include "ssd1306_tests.h"
+#include "ssd1306_custom_func.h"
+#include "ssd1306_aim1_icons.h"
 
 #define TAG "MAIN.C"
 
-#define I2C_MASTER_PORT I2C_NUM_0
+#define I2C_MASTER_PORT SSD1306_I2C_PORT
 #define I2C_SDA GPIO_NUM_21
 #define I2C_SCL GPIO_NUM_22
-#define DISPLAY_WIDTH 128
-#define DISPLAY_HEIGHT 64
+
+/*** Global Data - Values from sensors (SPS30, SGP40) ***/
+float SPS30_PM2_5;
+float SPS30_PM10;
+float SGP40_HUM;
+float SGP40_TEMP;
+float SGP40_VOC;
 
 /**
+ * @name                    i2c_initialize
+ * 
+ * @brief                   Initialize an I2C port
+ * 
+ * @param   mode            Set I2C as MASTER or SLAVE
+ * @param   sda_io_num      GPIO number for SDA
+ * @param   scl_io_num      GPIO number for SCL
+ * @param   sda_pullup_en   Enable or disable pullup
+ * @param   scl_pullup_en   Enable or disable pullup
+ * @param   clk_speed       Desired clock speed for I2C bus
+ * @param   i2c_num         I2C port to use
+ */
+static void i2c_initialize(i2c_mode_t mode, int sda_io_num, int scl_io_num, bool sda_pullup_en, bool scl_pullup_en, uint32_t clk_speed, i2c_port_t i2c_num)
+{
+    i2c_config_t conf = {
+        .mode = mode,
+        .sda_io_num = sda_io_num,
+        .scl_io_num = scl_io_num,
+        .sda_pullup_en = sda_pullup_en,
+        .scl_pullup_en = scl_pullup_en,
+        .master.clk_speed = clk_speed};
+    ESP_ERROR_CHECK(i2c_param_config(i2c_num, &conf));
+    ESP_ERROR_CHECK(i2c_driver_install(i2c_num, conf.mode, 0, 0, 0));
+}
+
+/**
+ * @name                display_data_OLED128x64_task
+ * 
+ * @brief               Display important air quality parameters measure by SPS30 on OLED
+ *                      display ( to add more sensors to display data e.g. temp and hum )
+ * 
+ * @param   pm2_5       Pointer to the measured sensor value of PM2.5
+ * @param   pm10_0      Pointer to the measured sensor value of PM10.0
+ * 
+ * @note                PM2.5 and PM10.0 are two measures of air quality that is mostly used to
+ *                      evaluate air quality
+ */
+void display_data_OLED128x64_task()
+{
+    while (1)
+    {
+        /* Buffers to write data */
+        char str_sps30_pm2_5_buf[64];
+        char str_sps30_pm10_0_buf[64];
+        char str_sgp40_temp_buf[64];
+        char str_sgp40_hum_buf[64];
+        char str_sgp40_voc_buf[64];
+
+        ssd1306_set_cursor(5, 13 * 0);
+        sprintf(str_sps30_pm2_5_buf, "%.02f PM2.5    ", SPS30_PM2_5);
+        ssd1306_write_string((char *)str_sps30_pm2_5_buf, Font_7x10, White);
+        ssd1306_set_cursor(5, 13 * 1);
+        sprintf(str_sps30_pm10_0_buf, "%.02f PM10.0    ", SPS30_PM10);
+        ssd1306_write_string((char *)str_sps30_pm10_0_buf, Font_7x10, White);
+        // ssd1306_binarizedimg_to_pixel(95, 0, 30, 30, humidity_icon_30x30);
+        ssd1306_set_cursor(5, 13 * 2);
+        sprintf(str_sgp40_temp_buf, "%.02f C    ", 25.6);
+        ssd1306_write_string((char *)str_sgp40_temp_buf, Font_7x10, White);
+        ssd1306_set_cursor(5, 13 * 3);
+        sprintf(str_sgp40_hum_buf, "%.02f %%    ", 54.6);
+        ssd1306_write_string((char *)str_sgp40_hum_buf, Font_7x10, White);
+        ssd1306_set_cursor(5, 13 * 4);
+        sprintf(str_sgp40_voc_buf, "%.02f IAQ    ", 25.33);
+        ssd1306_write_string((char *)str_sgp40_voc_buf, Font_7x10, White);
+        ssd1306_update_screen();
+    }
+}
+
+/**
+ * @name        sps30_task
+ * 
  * @brief       Task for SPS30 to read the measurements from the sensor.
+ * 
+ * @return      none
  */
 void sps30_task()
 {
@@ -118,53 +199,9 @@ void sps30_task()
                          m.nc_1p0, m.nc_2p5, m.nc_4p0, m.nc_10p0,
                          m.typical_particle_size);
 
-                // char str_sps30_pm1_0_buf[64];
-                // char str_sps30_pm2_5_buf[64];
-                // char str_sps30_pm4_0_buf[64];
-                // char str_sps30_pm10_0_buf[64];
-                // char str_sps30_nc0_5_buf[64];
-                // char str_sps30_nc1_0_buf[64];
-                // char str_sps30_nc2_5_buf[64];
-                // char str_sps30_nc4_0_buf[64];
-                // char str_sps30_nc10_0_buf[64];
-                // char str_sps30_typsize_buf[64];
-
-                // ssd1306_set_cursor(0, 0);
-                // sprintf(str_sps30_nc0_5_buf, "%0.2fnc0.5", m.nc_0p5);
-                // ssd1306_write_string((char *)str_sps30_nc0_5_buf, Font_6x8, White);
-                // ssd1306_set_cursor(0, 10);
-                // sprintf(str_sps30_nc1_0_buf, "%0.2fnc1.0", m.nc_1p0);
-                // ssd1306_write_string((char *)str_sps30_nc1_0_buf, Font_6x8, White);
-                // ssd1306_set_cursor(0, 20);
-                // sprintf(str_sps30_nc2_5_buf, "%0.2fnc2.5", m.nc_2p5);
-                // ssd1306_write_string((char *)str_sps30_nc2_5_buf, Font_6x8, White);
-                // ssd1306_set_cursor(0, 30);
-                // sprintf(str_sps30_nc4_0_buf, "%0.2fnc4.0", m.nc_4p0);
-                // ssd1306_write_string((char *)str_sps30_nc4_0_buf, Font_6x8, White);
-                // ssd1306_set_cursor(0, 40);
-                // sprintf(str_sps30_nc10_0_buf, "%0.2fnc10.0", m.nc_10p0);
-                // ssd1306_write_string((char *)str_sps30_nc10_0_buf, Font_6x8, White);
-                // ssd1306_set_cursor(0, 50);
-                // sprintf(str_sps30_typsize_buf, "%0.2f typ. part. size", m.typical_particle_size);
-                // ssd1306_write_string((char *)str_sps30_typsize_buf, Font_6x8, White);
-                // ssd1306_set_cursor(65, 0);
-                // sprintf(str_sps30_pm1_0_buf, "%.02fpm1.0", m.mc_1p0);
-                // ssd1306_write_string((char *)str_sps30_pm1_0_buf, Font_6x8, White);
-                // ssd1306_set_cursor(65, 10);
-                // sprintf(str_sps30_pm2_5_buf, "%.02fpm2.5", m.mc_2p5);
-                // ssd1306_write_string((char *)str_sps30_pm2_5_buf, Font_6x8, White);
-                // ssd1306_set_cursor(65, 20);
-                // sprintf(str_sps30_pm4_0_buf, "%.02fpm4.0", m.mc_4p0);
-                // ssd1306_write_string((char *)str_sps30_pm4_0_buf, Font_6x8, White);
-                // ssd1306_set_cursor(65, 30);
-                // sprintf(str_sps30_pm10_0_buf, "%.02fpm10.0", m.mc_10p0);
-                // ssd1306_write_string((char *)str_sps30_pm10_0_buf, Font_6x8, White);
-
-                ssd1306_set_cursor(0, 0);
-                #include "font8x8_basic.h"
-                
-
-                ssd1306_update_screen();
+                /* Assign SPS30 data to global variable */
+                SPS30_PM2_5 = m.mc_2p5;
+                SPS30_PM10 = m.mc_10p0;
             }
             sensirion_sleep_usec(1000000); /* sleep for 1s */
         }
@@ -205,7 +242,11 @@ void sps30_task()
 }
 
 /**
+ * @name        run_all_samsung_test
+ * 
  * @brief       Task to run all test codes for Samsung air conditioner.
+ * 
+ * @return      none
  */
 void run_all_samsung_test()
 {
@@ -224,21 +265,21 @@ void run_all_samsung_test()
 
 void app_main(void)
 {
-    i2c_config_t i2c_master_config = {
-        .mode = I2C_MODE_MASTER,
-        .scl_io_num = I2C_SCL,
-        .sda_io_num = I2C_SDA,
-        .scl_pullup_en = true,
-        .sda_pullup_en = true,
-        .master.clk_speed = 100000,
-    };
-    i2c_param_config(SSD1306_I2C_PORT, &i2c_master_config);
-    i2c_driver_install(SSD1306_I2C_PORT, i2c_master_config.mode, 0, 0, 0);
+    rmt_tx_init();                                                                          /* initialize ir peripheral of esp32 */
+    i2c_initialize(I2C_MODE_MASTER, I2C_SDA, I2C_SCL, true, true, 100000, I2C_MASTER_PORT); /* Initalize I2C communication for OLED */
+    ssd1306_init();                                                                         /* initialize driver for OLED display */
 
-    rmt_tx_init(); /* initialize ir peripheral of esp32 */
-    ssd1306_init();
+    /* */
+    ssd1306_binarizedimg_to_pixel(45, 0, 40, 40, xeleqt_icon_40x40);
+    ssd1306_set_cursor(7, 40);
+    ssd1306_write_string("Xeleqt Technologies", Font_6x8, White);
+    ssd1306_update_screen();
+    vTaskDelay(pdMS_TO_TICKS(5000));
+    ssd1306_fill(Black);
+    ssd1306_update_screen();
 
     /*** Task Creation ***/
     xTaskCreate(&sps30_task, "sps30 task", 1024 * 4, NULL, 2, NULL);
+    xTaskCreate(&display_data_OLED128x64_task, "OLED task", 1024 * 2, NULL, 3, NULL);
     // xTaskCreate(&run_all_samsung_test, "samsung test", 1024 * 2, NULL, 1, NULL);
 }

@@ -1,0 +1,36 @@
+----------------------------------------------------------------------------------------------------
+PARTICULATE MATTER
+
+What is PM? (source: https://www.aeroqual.com/particulate-matters-why-monitor-pm10-and-pm2-5)
+Particulate air pollution is defined by the US EPA as an air-suspended mixture of both solid and
+liquid particles. They are often separated into three classifications; coars, fine, and ultrafine
+particles. Coarse particles have a diameter of 10um and 2.5um and settle relatively quickly whereas
+fine (1 to 2.5um in diameter) and ultrafine (<1um in diameter) particles remain in suspension for
+longer. Keep in mind that due to how the scale is built, PM10 (course) also automatically contains
+PM2.5 (fine) and PM1.0 (ultrafine). Additionaly PM2.5 (fine) contains PM1.0 (ultrafine) as well. 
+To put things into perspective, the human hair has a diameter of 50-70um and a grain of sand has a
+diameter of 90um.
+
+When someone talks about PM10 they are referring to particles smaller then 10um. These particles 
+include dust, pollenn and mold spores. Conversely, when someone references PM2.5 they are referring
+to particles smaller than 2.5um. These smaller particles include combustion particles, organic 
+compounds and metals.
+
+Where does PM come from? (source: https://www.aeroqual.com/particulate-matters-why-monitor-pm10-and-pm2-5)
+Particulate matter can come from both human and natural sources. Natural sources include sea salt,
+forest fires, pollen and mold. As they are natural occurences, they are harder to control and are
+usually left unregulated. Human sources, however, can be regulated and understanding where PM comes
+from is very important, PM10 is most associated with road dust and construction activities. Wear and
+tear of brakes and tyres on vehicles and crushing activities at construction sites can all contribute
+to a rise in PM10. Alternatively, PM2.5 is more associated with fuel burning, industrial combustion
+processes and vehicle emissions.
+
+Particle pollution and you health (source: https://www.cdc.gov/air/particulate_matter.html)
+Breathing in particle pollution can be harmful to your health. Coarse (bigger) particles, called PM10,
+can irritate you eyes, nose, and throat. Dust from roads, farms, dry riverbeds, construction sites, and
+mines are types of PM10.
+
+Fine (smaller) particles, called PM2.5, are more dangerous because they can get into the deep parts of 
+your lungs - or even into your blood.
+
+PM Mass Concetration vs PM Number Concentration?
