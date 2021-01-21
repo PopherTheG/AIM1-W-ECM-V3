@@ -81,23 +81,68 @@ void display_data_OLED128x64_task()
         char str_sgp40_hum_buf[64];
         char str_sgp40_voc_buf[64];
 
-        ssd1306_set_cursor(5, 13 * 0);
-        sprintf(str_sps30_pm2_5_buf, "%.02f PM2.5    ", SPS30_PM2_5);
-        ssd1306_write_string((char *)str_sps30_pm2_5_buf, Font_7x10, White);
-        ssd1306_set_cursor(5, 13 * 1);
-        sprintf(str_sps30_pm10_0_buf, "%.02f PM10.0    ", SPS30_PM10);
-        ssd1306_write_string((char *)str_sps30_pm10_0_buf, Font_7x10, White);
-        // ssd1306_binarizedimg_to_pixel(95, 0, 30, 30, humidity_icon_30x30);
-        ssd1306_set_cursor(5, 13 * 2);
-        sprintf(str_sgp40_temp_buf, "%.02f C    ", 25.6);
-        ssd1306_write_string((char *)str_sgp40_temp_buf, Font_7x10, White);
-        ssd1306_set_cursor(5, 13 * 3);
-        sprintf(str_sgp40_hum_buf, "%.02f %%    ", 54.6);
-        ssd1306_write_string((char *)str_sgp40_hum_buf, Font_7x10, White);
-        ssd1306_set_cursor(5, 13 * 4);
-        sprintf(str_sgp40_voc_buf, "%.02f IAQ    ", 25.33);
-        ssd1306_write_string((char *)str_sgp40_voc_buf, Font_7x10, White);
+        uint8_t uvActivated = 1; /* 1: UV light is activated. 0: UV light is deactivated. */
+
+        /* SLIDE 1 START*/
+        /* Clean screen */
+        ssd1306_fill(Black);
         ssd1306_update_screen();
+
+        if (uvActivated) {
+            ssd1306_binarizedimg_to_pixel(0, 0, 15, 16, uv_icon_15x16);
+            ssd1306_set_cursor(17, 4);
+            ssd1306_write_string("ON", Font_6x8, White);
+        }
+
+        ssd1306_set_cursor(78, 4);
+        ssd1306_write_string("11:11 AM", Font_6x8, White);
+        
+        ssd1306_set_cursor(20, 18);
+        sprintf(str_sgp40_voc_buf, "%.02fAQI    ", 25.33);
+        ssd1306_write_string((char *)str_sgp40_voc_buf, Font_11x18, White);
+
+        ssd1306_binarizedimg_to_pixel(5, 40, 24, 24, humidity_icon_24x24);
+        ssd1306_set_cursor(30, 50);
+        sprintf(str_sgp40_hum_buf, "%.01f%%    ", 54.6);
+        ssd1306_write_string((char *)str_sgp40_hum_buf, Font_7x10, White);
+        
+        ssd1306_binarizedimg_to_pixel(75, 40, 11, 24, temp_icon_11x24);
+        ssd1306_set_cursor(90, 50);
+        sprintf(str_sgp40_temp_buf, "%.01fC    ", 25.6);
+        ssd1306_write_string((char *)str_sgp40_temp_buf, Font_7x10, White);
+
+        ssd1306_update_screen();
+        /* SLIDE 1 END*/
+        vTaskDelay(pdMS_TO_TICKS(5000));
+
+        /* SLIDE 2 START*/
+        /* Clean screen */
+        ssd1306_fill(Black);
+        ssd1306_update_screen();
+
+        if (uvActivated) {
+            ssd1306_binarizedimg_to_pixel(0, 0, 15, 16, uv_icon_15x16);
+            ssd1306_set_cursor(17, 4);
+            ssd1306_write_string("ON", Font_6x8, White);
+        }
+
+        ssd1306_set_cursor(78, 4);
+        ssd1306_write_string("11:11 AM", Font_6x8, White);
+
+        ssd1306_set_cursor(20, 18);
+        sprintf(str_sgp40_voc_buf, "%.02fAQI   ", 25.33);
+        ssd1306_write_string((char *)str_sgp40_voc_buf, Font_11x18, White);
+
+        ssd1306_binarizedimg_to_pixel(5, 40, 24, 24, particles_icon_24x24);
+        ssd1306_set_cursor(35, 42);
+        sprintf(str_sps30_pm2_5_buf, "%.02fPM2.5    ", SPS30_PM2_5);
+        ssd1306_write_string((char *)str_sps30_pm2_5_buf, Font_7x10, White);
+        ssd1306_set_cursor(35, 53);
+        sprintf(str_sps30_pm10_0_buf, "%.02fPM10.0    ", SPS30_PM10);
+        ssd1306_write_string((char *)str_sps30_pm10_0_buf, Font_7x10, White);
+        ssd1306_update_screen();
+        /* SLIDE 2 END*/
+        vTaskDelay(pdMS_TO_TICKS(5000));
     }
 }
 
@@ -274,12 +319,12 @@ void app_main(void)
     ssd1306_set_cursor(7, 40);
     ssd1306_write_string("Xeleqt Technologies", Font_6x8, White);
     ssd1306_update_screen();
-    vTaskDelay(pdMS_TO_TICKS(5000));
+    vTaskDelay(pdMS_TO_TICKS(1500));
     ssd1306_fill(Black);
     ssd1306_update_screen();
 
     /*** Task Creation ***/
     xTaskCreate(&sps30_task, "sps30 task", 1024 * 4, NULL, 2, NULL);
-    xTaskCreate(&display_data_OLED128x64_task, "OLED task", 1024 * 2, NULL, 3, NULL);
+    xTaskCreate(&display_data_OLED128x64_task, "OLED task", 1024 * 4, NULL, 1, NULL);
     // xTaskCreate(&run_all_samsung_test, "samsung test", 1024 * 2, NULL, 1, NULL);
 }

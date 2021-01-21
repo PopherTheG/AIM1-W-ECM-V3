@@ -23,5 +23,8 @@ extern FontDef Font_11x18;
 #ifdef SSD1306_INCLUDE_FONT_16x26
 extern FontDef Font_16x26;
 #endif
+#ifdef SSD1306_INCLUDE_FONT_8x16
+extern FontDef Font_8x16;
+#endif
 
 #endif /* COMPONENTS_SSD1306_SSD1306_FONTS */
