@@ -32,3 +32,9 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
   set(CMAKE_CROSSCOMPILING "TRUE")
 endif()
 
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for each subdirectory.
+  include("D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/esp-idf/newlib/port/cmake_install.cmake")
+
+endif()
+

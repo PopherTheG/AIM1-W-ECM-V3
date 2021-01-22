@@ -233,7 +233,7 @@ IDF_TARGET:STRING=esp32
 LEGACY_INCLUDE_COMMON_HEADERS:UNINITIALIZED=
 
 //No help, variable specified on the command line.
-PYTHON:UNINITIALIZED=C:\esp\tools\.espressif\python_env\idf4.1_py3.7_env\Scripts\python.exe
+PYTHON:UNINITIALIZED=C:/esp/tools/.espressif/python_env/idf4.3_py3.7_env/Scripts/python.exe
 
 //No help, variable specified on the command line.
 PYTHON_DEPS_CHECKED:UNINITIALIZED=1
@@ -242,22 +242,34 @@ PYTHON_DEPS_CHECKED:UNINITIALIZED=1
 SDKCONFIG:UNINITIALIZED=D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/sdkconfig
 
 //Dependencies for the target
-__idf_bootloader_support_LIB_DEPENDS:STATIC=general;__idf_log;
+__idf_bootloader_support_LIB_DEPENDS:STATIC=general;__idf_log;general;__idf_esp_rom;general;__idf_esp_common;general;__idf_esp_hw_support;general;__idf_hal;
 
 //Dependencies for the target
-__idf_efuse_LIB_DEPENDS:STATIC=general;__idf_log;
+__idf_efuse_LIB_DEPENDS:STATIC=general;__idf_log;general;__idf_esp_rom;general;__idf_esp_common;general;__idf_esp_hw_support;general;__idf_hal;
 
 //Dependencies for the target
-__idf_main_LIB_DEPENDS:STATIC=general;__idf_log;
+__idf_esp_hw_support_LIB_DEPENDS:STATIC=general;__idf_log;general;__idf_esp_rom;general;__idf_esp_common;general;__idf_hal;
 
 //Dependencies for the target
-__idf_micro-ecc_LIB_DEPENDS:STATIC=general;__idf_log;
+__idf_esp_rom_LIB_DEPENDS:STATIC=general;__idf_log;general;__idf_esp_hw_support;general;__idf_hal;
 
 //Dependencies for the target
-__idf_soc_LIB_DEPENDS:STATIC=general;__idf_log;general;__idf_esp_rom;general;__idf_esp_common;general;__idf_xtensa;
+__idf_hal_LIB_DEPENDS:STATIC=general;__idf_log;general;__idf_esp_rom;general;__idf_esp_common;general;__idf_esp_hw_support;
 
 //Dependencies for the target
-__idf_spi_flash_LIB_DEPENDS:STATIC=general;__idf_log;
+__idf_log_LIB_DEPENDS:STATIC=general;__idf_esp_rom;general;__idf_esp_hw_support;general;__idf_hal;
+
+//Dependencies for the target
+__idf_main_LIB_DEPENDS:STATIC=general;__idf_log;general;__idf_esp_rom;general;__idf_esp_hw_support;general;__idf_hal;
+
+//Dependencies for the target
+__idf_micro-ecc_LIB_DEPENDS:STATIC=general;__idf_log;general;__idf_esp_rom;general;__idf_esp_common;general;__idf_esp_hw_support;general;__idf_hal;
+
+//Dependencies for the target
+__idf_soc_LIB_DEPENDS:STATIC=general;__idf_log;general;__idf_esp_rom;general;__idf_esp_common;general;__idf_esp_hw_support;general;__idf_hal;
+
+//Dependencies for the target
+__idf_spi_flash_LIB_DEPENDS:STATIC=general;__idf_log;general;__idf_esp_rom;general;__idf_esp_common;general;__idf_esp_hw_support;general;__idf_hal;
 
 //Value Computed by CMake
 bootloader_BINARY_DIR:STATIC=D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/bootloader
@@ -379,7 +391,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=16
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=20
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
