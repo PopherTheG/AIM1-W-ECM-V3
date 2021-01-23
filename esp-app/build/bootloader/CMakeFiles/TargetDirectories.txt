@@ -1,4 +1,3 @@
-D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/bootloader/CMakeFiles/size.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/bootloader/CMakeFiles/_project_elf_src.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/bootloader/CMakeFiles/confserver.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/bootloader/CMakeFiles/erase_flash.dir
@@ -7,6 +6,7 @@ D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/bootloader/CMakeFiles/menuconfig.
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/bootloader/CMakeFiles/gen_project_binary.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/bootloader/CMakeFiles/bootloader.elf.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/bootloader/CMakeFiles/monitor.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/bootloader/CMakeFiles/size.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/bootloader/CMakeFiles/size-files.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/bootloader/CMakeFiles/size-components.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/esp-app/build/bootloader/CMakeFiles/uf2-app.dir

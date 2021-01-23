@@ -31,6 +31,7 @@ float SPS30_PM10;
 float SGP40_HUM;
 float SGP40_TEMP;
 float SGP40_VOC;
+float SCD4x_CO2;
 
 /**
  * @name                    i2c_initialize
@@ -72,8 +73,8 @@ void display_uv_OLED128x64()
 void display_aqi_OLED128x64()
 {
     char str_sgp40_voc_buf[64];
-    ssd1306_set_cursor(20, 20);
-    sprintf(str_sgp40_voc_buf, "%.02fAQI   ", 25.33);
+    ssd1306_set_cursor(23, 23);
+    sprintf(str_sgp40_voc_buf, "%.01fAQI   ", 25.33);
     ssd1306_write_string((char *)str_sgp40_voc_buf, Font_11x18, White);
 }
 
@@ -88,18 +89,18 @@ void display_clearrow_OLED128x64(uint8_t x, uint8_t y, SSD1306_COLOR color)
 void display_temp_OLED128x64()
 {
     char str_sgp40_temp_buf[64];
-    ssd1306_binarizedimg_to_pixel(32, 1, 16, 16, temp_icon_16x16);
-    ssd1306_set_cursor(47, 4);
+    ssd1306_binarizedimg_to_pixel(34, 0, 16, 16, temp_icon_16x16);
+    ssd1306_set_cursor(51, 4);
     sprintf(str_sgp40_temp_buf, "%.01fC    ", 25.6);
     ssd1306_write_string((char *)str_sgp40_temp_buf, Font_6x8, White);
 }
 
 void display_hum_OLED128x64()
-{
+{  
     char str_sgp40_hum_buf[64];
-    ssd1306_binarizedimg_to_pixel(78, 0, 16, 16, humidity_icon_16x16);
-    ssd1306_set_cursor(94, 4);
-    sprintf(str_sgp40_hum_buf, "%.01f%%    ", 54.6);
+    ssd1306_binarizedimg_to_pixel(86, 0, 16, 16, humidity_icon_16x16);
+    ssd1306_set_cursor(103, 4);
+    sprintf(str_sgp40_hum_buf, "%.00f%%    ", 99.6);
     ssd1306_write_string((char *)str_sgp40_hum_buf, Font_6x8, White);
 }
 
@@ -107,13 +108,13 @@ void display_PM2_5_PM10_OLED128x64()
 {
     char str_sps30_pm2_5_buf[64];
     char str_sps30_pm10_0_buf[64];
-    ssd1306_binarizedimg_to_pixel(5, 40, 24, 24, particles_icon_24x24);
-    ssd1306_set_cursor(35, 42);
-    sprintf(str_sps30_pm2_5_buf, "%.02fPM2.5    ", SPS30_PM2_5);
+    // ssd1306_binarizedimg_to_pixel(0, 40, 24, 24, particles_icon_24x24);
+    ssd1306_set_cursor(0, 50);
+    sprintf(str_sps30_pm2_5_buf, "PM2.5:%.02f PM10:%.02f    ", SPS30_PM2_5, SPS30_PM10);
     ssd1306_write_string((char *)str_sps30_pm2_5_buf, Font_6x8, White);
-    ssd1306_set_cursor(35, 53);
-    sprintf(str_sps30_pm10_0_buf, "%.02fPM10.0    ", SPS30_PM10);
-    ssd1306_write_string((char *)str_sps30_pm10_0_buf, Font_6x8, White);
+    // ssd1306_set_cursor(25, 53);
+    // sprintf(str_sps30_pm10_0_buf, "%.02fPM10.0    ", SPS30_PM10);
+    // ssd1306_write_string((char *)str_sps30_pm10_0_buf, Font_6x8, White);
 }
 
 /**
@@ -132,36 +133,6 @@ void display_data_OLED128x64_task()
 {
     while (1)
     {
-        // /* SLIDE 1 START*/
-        // // ssd1306_fill(Black); /* Clean screen */
-        // // ssd1306_update_screen();
-        // display_uv_OLED128x64();
-        // display_aqi_OLED128x64();
-        // for (uint32_t i = 40; i < SSD1306_HEIGHT; i++)
-        // {
-        //     display_clearrow_OLED128x64(0, i, Black);
-        // }
-        // display_hum_OLED128x64();
-        // display_temp_OLED128x64();
-        // ssd1306_update_screen();
-        // /* SLIDE 1 END*/
-
-        // vTaskDelay(pdMS_TO_TICKS(5000));
-
-        // /* SLIDE 2 START*/
-        // // ssd1306_fill(Black); /* Clean screen */
-        // // ssd1306_update_screen();
-        // display_uv_OLED128x64();
-        // display_aqi_OLED128x64();
-        // for (uint32_t i = 40; i < SSD1306_HEIGHT; i++)
-        // {
-        //     display_clearrow_OLED128x64(0, i, Black);
-        // }
-        // display_PM2_5_PM10_OLED128x64();
-
-        // ssd1306_update_screen();
-        // /* SLIDE 2 END*/
-        // vTaskDelay(pdMS_TO_TICKS(5000));
         display_uv_OLED128x64();
         display_aqi_OLED128x64();
         display_temp_OLED128x64();

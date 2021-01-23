@@ -1,0 +1,10 @@
+SGP40 		- VOC Sensor - Note: SGP30 and SGPC3 (their low power consumption version) are going to be deprecated
+SPS30 		- PM Sensor
+SHT40 		- TEMP and HUM Sensor
+SCD40		- CO2 Sensor - Note: Coming soon
+
+SCD30		- CO2 and HUM and TEMP Sensor Module
+STS30-DIS 	- FOR TEMP
+    
+GBT 18883-2002 
+GB  50325-2010   
