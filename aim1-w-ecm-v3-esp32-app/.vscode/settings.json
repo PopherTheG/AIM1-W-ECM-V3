@@ -12,7 +12,14 @@
     "ssd1306_aim1_icons.h": "c",
     "sensirion_uart_hal.h": "c",
     "samsung_test.h": "c",
-    "ssd1306.h": "c"
+    "ssd1306.h": "c",
+    "stdbool.h": "c",
+    "lvgl.h": "c",
+    "lv_demo_widgets.h": "c",
+    "lvgl_helpers.h": "c",
+    "lv_demo_printer.h": "c",
+    "lv_demo_printer_theme.h": "c",
+    "lv_demo_stress.h": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled"
 }

@@ -1,53 +1,116 @@
+/* Standard C library related includes*/
 #include <stdio.h>
-#include "main.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+/* end */
 
+/* ESP32 related includes */
 #include "esp_log.h"
+#include "esp_system.h"
+#include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "esp_freertos_hooks.h"
+#include "freertos/semphr.h"
 #include "driver/gpio.h"
 #include "driver/uart.h"
 #include "driver/i2c.h"
 #include "driver/rmt.h"
-#include "string.h"
+/* end */
 
 /* Sensirion related includes */
 #include "sensirion_common.h"
 #include "sensirion_config.h"
 #include "sensirion_sleep.h"
+/* end */
 
 /* SPS30 related includes*/
 #include "sensirion_shdlc.h"
 #include "sensirion_uart_hal.h"
 #include "sps30.h"
+/* end */
 
 /* SVM40 related includes*/
 #include "svm40.h"
 #include "sensirion_i2c_hal.h"
 #include "sensirion_i2c.h"
-
-/* SSD1306 related includes */
-#include "ssd1306.h"
-#include "ssd1306_tests.h"
-#include "ssd1306_custom_func.h"
-#include "ssd1306_aim1_icons.h"
+/* end */
 
 /* IR transmitter related includes */
 #include "irtransmitter.h"
 #include "samsung_test.h"
+/* end */
+
+/* LittleVGL specific includes */
+#ifdef LV_CONF_INCLUDE_SIMPLE
+#include "lvgl.h"
+#else
+#include "lvgl/lvgl.h"
+#endif
+
+#include "lvgl_helpers.h"
+
+#include "lv_examples/src/lv_ex_get_started/lv_ex_get_started.h"
+
+#ifndef CONFIG_LV_TFT_DISPLAY_MONOCHROME
+#if defined CONFIG_LV_USE_DEMO_WIDGETS
+#include "lv_examples/src/lv_demo_widgets/lv_demo_widgets.h"
+#elif defined CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
+#include "lv_examples/src/lv_demo_keypad_and_encoder/lv_demo_keypad_and_encoder.h"
+#elif defined CONFIG_LV_USE_DEMO_BENCHMARK
+#include "lv_examples/src/lv_demo_benchmark/lv_demo_benchmark.h"
+#elif defined CONFIG_LV_USE_DEMO_STRESS
+#include "lv_examples/src/lv_demo_stress/lv_demo_stress.h"
+#else
+#error "No demo application selected."
+#endif
+#endif
+/* end */
 
 #define TAG "MAIN.C"
 
-#define I2C_MASTER_PORT SSD1306_I2C_PORT
-#define I2C_SDA GPIO_NUM_21
-#define I2C_SCL GPIO_NUM_22
+#define I2C_MASTER_PORT I2C_NUM_0
+#define I2C_SDA GPIO_NUM_32
+#define I2C_SCL GPIO_NUM_33
+
+/* lvgl related defines */
+#define LV_TICK_PERIOD_MS 1
+
+/* static prototypes */
+static void i2c_initialize(i2c_mode_t mode, int sda_io_num, int scl_io_num, bool sda_pullup_en, bool scl_pullup_en, uint32_t clk_speed, i2c_port_t i2c_num);
+static void lv_tick_task(void *arg);
+static void guiTask(void *pvParameters);
+// static void create_demo_application(void);
+static void sps30_task();
+static void svm40_task();
+static void run_all_samsung_test();
+static void st7899_display_application(float *PM2_5_data, float *PM10_data, float *VOC_data, float *HUM_data, float *TEMP_data, float *CO2_data);
 
 /*** Global Data - Values from sensors (SPS30, SGP40) ***/
-float SPS30_PM2_5;
-float SPS30_PM10;
-float SVM40_VOC;
-float SVM40_HUM;
-float SVM40_TEMP;
-float SCD4x_CO2;
+float SPS30_PM2_5 = 4.5;
+float SPS30_PM10 = 5.6;
+float SVM40_VOC = 25.6;
+
+float SVM40_HUM = 57.6;
+float SVM40_TEMP = 27.1;
+float SCD4x_CO2 = 768;
+
+
+void app_main(void)
+{
+    rmt_tx_init();                                                                          /* initialize ir peripheral of esp32 */
+    i2c_initialize(I2C_MODE_MASTER, I2C_SDA, I2C_SCL, true, true, 100000, I2C_MASTER_PORT); /* Initalize I2C communication for OLED */
+
+    /*** Task Creation ***/
+    /* If you want to use a task to create the graphic, you NEED to create a Pinned
+    task. Otherwise there can be problem such as memory corruption and so on.
+    NOTE: When not using Wi-Fi nor Bluetooth you can pin the guiTask to core 0. */
+    xTaskCreatePinnedToCore(guiTask, "gui", 4096 * 2, NULL, 0, NULL, 1);
+    xTaskCreate(sps30_task, "sps30 task", 1024 * 4, NULL, 2, NULL);
+    xTaskCreate(svm40_task, "svm40 task", 1024 * 2, NULL, 2, NULL);
+    xTaskCreate(run_all_samsung_test, "samsung ac test", 1024 * 2, NULL, 2, NULL);
+}
 
 /**
  * @name                    i2c_initialize
@@ -75,95 +138,6 @@ static void i2c_initialize(i2c_mode_t mode, int sda_io_num, int scl_io_num, bool
     ESP_ERROR_CHECK(i2c_driver_install(i2c_num, conf.mode, 0, 0, 0));
 }
 
-/*** Display components for OLED START ***/
-void display_uv_OLED128x64()
-{
-    uint8_t uvActivated = 1; /* 1: UV light is activated. 0: UV light is deactivated. */
-    if (uvActivated)
-    {
-        ssd1306_binarizedimg_to_pixel(0, 1, 15, 16, uv_icon_15x16);
-        ssd1306_set_cursor(17, 4);
-        ssd1306_write_string("ON", Font_6x8, White);
-    }
-}
-
-void display_aqi_OLED128x64()
-{
-    char str_sgp40_voc_buf[64];
-    ssd1306_set_cursor(23, 23);
-    sprintf(str_sgp40_voc_buf, "%.01fVOC   ", SVM40_VOC);
-    ssd1306_write_string((char *)str_sgp40_voc_buf, Font_11x18, White);
-}
-
-void display_clearrow_OLED128x64(uint8_t x, uint8_t y, SSD1306_COLOR color)
-{
-    for (uint32_t i = x; i < SSD1306_WIDTH; i++)
-    {
-        ssd1306_draw_pixel(i, y, color);
-    }
-}
-
-void display_temp_OLED128x64()
-{
-    char str_sgp40_temp_buf[64];
-    ssd1306_binarizedimg_to_pixel(34, 0, 16, 16, temp_icon_16x16);
-    ssd1306_set_cursor(51, 4);
-    sprintf(str_sgp40_temp_buf, "%.01fC    ", SVM40_TEMP);
-    ssd1306_write_string((char *)str_sgp40_temp_buf, Font_6x8, White);
-}
-
-void display_hum_OLED128x64()
-{
-    char str_sgp40_hum_buf[64];
-    ssd1306_binarizedimg_to_pixel(86, 0, 16, 16, humidity_icon_16x16);
-    ssd1306_set_cursor(103, 4);
-    sprintf(str_sgp40_hum_buf, "%.00f%%    ", SVM40_HUM);
-    ssd1306_write_string((char *)str_sgp40_hum_buf, Font_6x8, White);
-}
-
-void display_PM2_5_PM10_OLED128x64()
-{
-    char str_sps30_pm2_5_pm10_0_buf[64];
-    ssd1306_set_cursor(0, 45);
-    sprintf(str_sps30_pm2_5_pm10_0_buf, "PM2.5:%.02f PM10:%.02f    ", SPS30_PM2_5, SPS30_PM10);
-    ssd1306_write_string((char *)str_sps30_pm2_5_pm10_0_buf, Font_6x8, White);
-}
-
-void display_CO2_TVOC_OLED128x64()
-{
-    char str_scd4x_co2_buf[64];
-    ssd1306_set_cursor(0, 56);
-    sprintf(str_scd4x_co2_buf, "CO2:%.00fppm", (float)2501);
-    ssd1306_write_string((char *)str_scd4x_co2_buf, Font_6x8, White);
-}
-/*** Display components for OLED END ***/
-
-/**
- * @name                display_data_OLED128x64_task
- * 
- * @brief               Display important air quality parameters measure by SPS30 on OLED
- *                      display ( to add more sensors to display data e.g. temp and hum )
- * 
- * @param   pm2_5       Pointer to the measured sensor value of PM2.5
- * @param   pm10_0      Pointer to the measured sensor value of PM10.0
- *   
- * @note                PM2.5 and PM10.0 are two measures of air quality that is mostly used to      
- *                      evaluate air quality
- */
-void display_data_OLED128x64_task()
-{
-    while (1)
-    {
-        display_uv_OLED128x64();
-        display_aqi_OLED128x64();
-        display_temp_OLED128x64();
-        display_hum_OLED128x64();
-        display_PM2_5_PM10_OLED128x64();
-        display_CO2_TVOC_OLED128x64();
-        ssd1306_update_screen();
-    }
-}
-
 /**
  * @name        sps30_task
  * 
@@ -171,7 +145,7 @@ void display_data_OLED128x64_task()
  * 
  * @return      none
  */
-void sps30_task()
+static void sps30_task()
 {
     struct sps30_measurement m;
     char serial[SPS30_MAX_SERIAL_LEN];
@@ -311,7 +285,7 @@ void sps30_task()
  * 
  * @return      none
  */
-void svm40_task()
+static void svm40_task()
 {
     int16_t error;
     char serial_id[SVM40_MAX_SERIAL_LEN];
@@ -416,7 +390,7 @@ void svm40_task()
  * 
  * @return      none
  */
-void run_all_samsung_test()
+static void run_all_samsung_test()
 {
     while (1)
     {
@@ -431,17 +405,149 @@ void run_all_samsung_test()
     }
 }
 
-void app_main(void)
-{
-    rmt_tx_init();                                                                          /* initialize ir peripheral of esp32 */
-    i2c_initialize(I2C_MODE_MASTER, I2C_SDA, I2C_SCL, true, true, 100000, I2C_MASTER_PORT); /* Initalize I2C communication for OLED */
-    ssd1306_init();                                                                         /* initialize driver for OLED display */
-    ssd1306_fill(Black);
-    ssd1306_update_screen();
+/**
+ * Creates a semaphore to handle concurrent calls to lvgl stuff.
+ * If you wish to call *any* lvgl function from other threads/tasks
+ * you should lock on the very same semaphore! */
+SemaphoreHandle_t xGuiSemaphore;
 
-    /*** Task Creation ***/
-    xTaskCreate(&sps30_task, "sps30 task", 1024 * 4, NULL, 2, NULL);
-    xTaskCreate(&svm40_task, "svm40 task", 1024 * 2, NULL, 2, NULL);
-    xTaskCreate(&display_data_OLED128x64_task, "OLED task", 1024 * 4, NULL, 3, NULL);
-    // xTaskCreate(&guvc_t10gm_la_task, "uv sensor task", 1*1024, NULL, 2, NULL);
+static void guiTask(void *pvParameter)
+{
+
+    (void)pvParameter;
+    xGuiSemaphore = xSemaphoreCreateMutex();
+
+    lv_init();
+
+    /* Initialize SPI or I2C bus used by the drivers */
+    lvgl_driver_init();
+
+    static lv_color_t buf1[DISP_BUF_SIZE];
+
+    /* Use double buffered when not working with monochrome displays */
+#ifndef CONFIG_LV_TFT_DISPLAY_MONOCHROME
+    static lv_color_t buf2[DISP_BUF_SIZE];
+#else
+    static lv_color_t *buf2 = NULL;
+#endif
+
+    static lv_disp_buf_t disp_buf;
+
+    uint32_t size_in_px = DISP_BUF_SIZE;
+
+#if defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_IL3820 || defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_JD79653A || defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_UC8151D
+
+    /* Actual size in pixels, not bytes. */
+    size_in_px *= 8;
+#endif
+
+    /* Initialize the working buffer depending on the selected display.
+     * NOTE: buf2 == NULL when using monochrome displays. */
+    lv_disp_buf_init(&disp_buf, buf1, buf2, size_in_px);
+
+    lv_disp_drv_t disp_drv;
+    lv_disp_drv_init(&disp_drv);
+    disp_drv.flush_cb = disp_driver_flush;
+
+    /* When using a monochrome display we need to register the callbacks:
+     * - rounder_cb
+     * - set_px_cb */
+#ifdef CONFIG_LV_TFT_DISPLAY_MONOCHROME
+    disp_drv.rounder_cb = disp_driver_rounder;
+    disp_drv.set_px_cb = disp_driver_set_px;
+#endif
+
+    disp_drv.buffer = &disp_buf;
+    lv_disp_drv_register(&disp_drv);
+
+    /* Register an input device when enabled on the menuconfig */
+#if CONFIG_LV_TOUCH_CONTROLLER != TOUCH_CONTROLLER_NONE
+    lv_indev_drv_t indev_drv;
+    lv_indev_drv_init(&indev_drv);
+    indev_drv.read_cb = touch_driver_read;
+    indev_drv.type = LV_INDEV_TYPE_POINTER;
+    lv_indev_drv_register(&indev_drv);
+#endif
+
+    /* Create and start a periodic timer interrupt to call lv_tick_inc */
+    const esp_timer_create_args_t periodic_timer_args = {
+        .callback = &lv_tick_task,
+        .name = "periodic_gui"};
+    esp_timer_handle_t periodic_timer;
+    ESP_ERROR_CHECK(esp_timer_create(&periodic_timer_args, &periodic_timer));
+    ESP_ERROR_CHECK(esp_timer_start_periodic(periodic_timer, LV_TICK_PERIOD_MS * 1000));
+
+    /* Create the demo application */
+    st7899_display_application(&SPS30_PM2_5, &SPS30_PM10, &SVM40_VOC, &SVM40_HUM, &SVM40_TEMP, &SCD4x_CO2);
+    while (1)
+    {
+        /* Delay 1 tick (assumes FreeRTOS tick is 10ms */
+        vTaskDelay(pdMS_TO_TICKS(10));
+
+        /* Try to take the semaphore, call lvgl related function on success */
+        if (pdTRUE == xSemaphoreTake(xGuiSemaphore, portMAX_DELAY))
+        {
+            lv_task_handler();
+            xSemaphoreGive(xGuiSemaphore);
+        }
+    }
+
+    /* A task should NEVER return */
+    vTaskDelete(NULL);
+}
+
+
+static void st7899_display_application(float *PM2_5_data, float *PM10_data, float *VOC_data, float *HUM_data, float *TEMP_data, float *CO2_data)
+{
+    /* Create an Arc */
+    lv_obj_t * arc = lv_arc_create(lv_scr_act(), NULL);
+    lv_arc_set_end_angle(arc, 200);
+    lv_obj_set_size(arc, 150, 150);
+    lv_obj_align(arc, NULL, LV_ALIGN_CENTER, 0, 0);
+}
+
+// static void create_demo_application(void)
+// {
+//     /* When using a monochrome display we only show "Hello World" centered on the 
+//      * screen */
+// #if defined CONFIG_LV_TFT_DISPLAY_MONOCHROME || defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_ST7735S
+//     /* use a pretty small demo for monochrome displays */
+//     /* Get the current screen  */
+//     lv_obj_t *scr = lv_disp_get_scr_act(NULL);
+
+//     /*Create a Label on the currently active screen*/
+//     lv_obj_t *label1 = lv_label_create(scr, NULL);
+
+//     /*Modify the Label's text*/
+//     lv_label_set_text(label1, "Hello\nworld");
+
+//     /* Align the Label to the center
+//      * NULL means align on parent (which is the screen now)
+//      * 0, 0 at the end means an x, y offset after alignment*/
+//     lv_obj_align(label1, NULL, LV_ALIGN_CENTER, 0, 0);
+// #else
+//     /* Otherwise we show the selected demo */
+
+// #if defined CONFIG_LV_USE_DEMO_WIDGETS
+//     lv_demo_widgets();
+//     // lv_ex_get_started_1();
+//     // lv_ex_get_started_2();
+//     // lv_ex_get_started_3();
+// #elif defined CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
+//     lv_demo_keypad_encoder();
+// #elif defined CONFIG_LV_USE_DEMO_BENCHMARK
+//     lv_demo_benchmark();
+// #elif defined CONFIG_LV_USE_DEMO_STRESS
+//     lv_demo_stress();
+// #else
+// #error "No demo application selected."
+// #endif
+// #endif
+// } 
+
+static void lv_tick_task(void *arg)
+{
+    (void)arg;
+
+    lv_tick_inc(LV_TICK_PERIOD_MS);
 }

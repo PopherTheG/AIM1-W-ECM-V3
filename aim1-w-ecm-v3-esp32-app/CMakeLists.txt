@@ -5,4 +5,7 @@ cmake_minimum_required(VERSION 3.5)
 
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+
+# to add the KConfig of the esp32_drivers
+list(APPEND EXTRA_COMPONENT_DIRS components/lvgl_esp32_drivers components/lvgl_esp32_drivers/lvgl_touch components/lvgl_esp32_drivers/lvgl_tft)
 project(esp-app)
