@@ -541,6 +541,7 @@ static void st7899_display_application()
  */ 
 void pm2_5_value_refresher_task(lv_task_t *task_info)
 {
+    /* update label */
     lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "PM2.5: %.02f", SPS30_PM2_5);
 }
 /**
@@ -548,6 +549,7 @@ void pm2_5_value_refresher_task(lv_task_t *task_info)
  */ 
 void pm10_value_refresher_task(lv_task_t *task_info)
 {
+    /* update label */
     lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "PM10: %.02f", SPS30_PM10);
 }
 /**
@@ -555,6 +557,7 @@ void pm10_value_refresher_task(lv_task_t *task_info)
  */ 
 void voc_value_refresher_task(lv_task_t *task_info)
 {
+    /* update label */
     lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "VOC: %.02f", SVM40_VOC);
 }
 /**
@@ -562,13 +565,15 @@ void voc_value_refresher_task(lv_task_t *task_info)
  */ 
 void temp_value_refresher_task(lv_task_t *task_info)
 {
-    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "Temperature: %.02f degC", SVM40_TEMP);
+    /* update label */
+    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "Temperature: %.02f°C", SVM40_TEMP);
 }
 /**
  * @brief   callback function to update hum variable data on the display.
  */ 
 void hum_value_refresher_task(lv_task_t *task_info)
 {
+    /* update label */
     lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "Humidity: %.02f%%", SVM40_HUM);
 }
 
