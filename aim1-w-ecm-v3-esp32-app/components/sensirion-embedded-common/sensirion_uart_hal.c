@@ -41,7 +41,7 @@
 #include "esp_err.h"
 
 
-#define SPS30_UART      UART_NUM_1 
+#define SPS30_UART      UART_NUM_1
 #define TXD_PIN_UART1   GPIO_NUM_25
 #define RXD_PIN_UART1   GPIO_NUM_26
 #define RX_BUF_SIZE     (1024 * 1)

@@ -51,8 +51,6 @@
 
 #include "lvgl_helpers.h"
 
-#include "lv_examples/src/lv_ex_get_started/lv_ex_get_started.h"
-
 #ifndef CONFIG_LV_TFT_DISPLAY_MONOCHROME
 #if defined CONFIG_LV_USE_DEMO_WIDGETS
 #include "lv_examples/src/lv_demo_widgets/lv_demo_widgets.h"
@@ -70,37 +68,35 @@
 
 #define TAG "MAIN.C"
 
+/* lvgl related defines */
+#define LV_TICK_PERIOD_MS 1
+
 #define I2C_MASTER_PORT I2C_NUM_0
 #define I2C_SDA GPIO_NUM_32
 #define I2C_SCL GPIO_NUM_33
 
-/* lvgl related defines */
-#define LV_TICK_PERIOD_MS 1
-
 /* static prototypes */
-static void i2c_initialize(i2c_mode_t mode, int sda_io_num, int scl_io_num, bool sda_pullup_en, bool scl_pullup_en, uint32_t clk_speed, i2c_port_t i2c_num);
 static void lv_tick_task(void *arg);
 static void guiTask(void *pvParameters);
-// static void create_demo_application(void);
 static void sps30_task();
 static void svm40_task();
 static void run_all_samsung_test();
-static void st7899_display_application(float *PM2_5_data, float *PM10_data, float *VOC_data, float *HUM_data, float *TEMP_data, float *CO2_data);
+static void st7899_display_application();
+static void i2c_initialize(i2c_mode_t mode, int sda_io_num, int scl_io_num, bool sda_pullup_en, bool scl_pullup_en, uint32_t clk_speed, i2c_port_t i2c_num);
 
 /*** Global Data - Values from sensors (SPS30, SGP40) ***/
-float SPS30_PM2_5 = 4.5;
-float SPS30_PM10 = 5.6;
+float SPS30_PM2_5;
+float SPS30_PM10;
 float SVM40_VOC = 25.6;
 
 float SVM40_HUM = 57.6;
 float SVM40_TEMP = 27.1;
 float SCD4x_CO2 = 768;
 
-
 void app_main(void)
 {
-    rmt_tx_init();                                                                          /* initialize ir peripheral of esp32 */
-    i2c_initialize(I2C_MODE_MASTER, I2C_SDA, I2C_SCL, true, true, 100000, I2C_MASTER_PORT); /* Initalize I2C communication for OLED */
+    rmt_tx_init();                                                                    /* initialize ir peripheral of esp32 */
+    i2c_initialize(I2C_MODE_MASTER, I2C_SDA, I2C_SCL, true, true, 100000, I2C_NUM_0); /* Slaves connected: SVM40 */
 
     /*** Task Creation ***/
     /* If you want to use a task to create the graphic, you NEED to create a Pinned
@@ -477,11 +473,11 @@ static void guiTask(void *pvParameter)
     ESP_ERROR_CHECK(esp_timer_create(&periodic_timer_args, &periodic_timer));
     ESP_ERROR_CHECK(esp_timer_start_periodic(periodic_timer, LV_TICK_PERIOD_MS * 1000));
 
-    /* Create the demo application */
-    st7899_display_application(&SPS30_PM2_5, &SPS30_PM10, &SVM40_VOC, &SVM40_HUM, &SVM40_TEMP, &SCD4x_CO2);
+    st7899_display_application();
     while (1)
     {
         /* Delay 1 tick (assumes FreeRTOS tick is 10ms */
+
         vTaskDelay(pdMS_TO_TICKS(10));
 
         /* Try to take the semaphore, call lvgl related function on success */
@@ -496,58 +492,86 @@ static void guiTask(void *pvParameter)
     vTaskDelete(NULL);
 }
 
-
-static void st7899_display_application(float *PM2_5_data, float *PM10_data, float *VOC_data, float *HUM_data, float *TEMP_data, float *CO2_data)
-{
-    /* Create an Arc */
-    lv_obj_t * arc = lv_arc_create(lv_scr_act(), NULL);
-    lv_arc_set_end_angle(arc, 200);
-    lv_obj_set_size(arc, 150, 150);
-    lv_obj_align(arc, NULL, LV_ALIGN_CENTER, 0, 0);
-}
-
-// static void create_demo_application(void)
-// {
-//     /* When using a monochrome display we only show "Hello World" centered on the 
-//      * screen */
-// #if defined CONFIG_LV_TFT_DISPLAY_MONOCHROME || defined CONFIG_LV_TFT_DISPLAY_CONTROLLER_ST7735S
-//     /* use a pretty small demo for monochrome displays */
-//     /* Get the current screen  */
-//     lv_obj_t *scr = lv_disp_get_scr_act(NULL);
-
-//     /*Create a Label on the currently active screen*/
-//     lv_obj_t *label1 = lv_label_create(scr, NULL);
-
-//     /*Modify the Label's text*/
-//     lv_label_set_text(label1, "Hello\nworld");
-
-//     /* Align the Label to the center
-//      * NULL means align on parent (which is the screen now)
-//      * 0, 0 at the end means an x, y offset after alignment*/
-//     lv_obj_align(label1, NULL, LV_ALIGN_CENTER, 0, 0);
-// #else
-//     /* Otherwise we show the selected demo */
-
-// #if defined CONFIG_LV_USE_DEMO_WIDGETS
-//     lv_demo_widgets();
-//     // lv_ex_get_started_1();
-//     // lv_ex_get_started_2();
-//     // lv_ex_get_started_3();
-// #elif defined CONFIG_LV_USE_DEMO_KEYPAD_AND_ENCODER
-//     lv_demo_keypad_encoder();
-// #elif defined CONFIG_LV_USE_DEMO_BENCHMARK
-//     lv_demo_benchmark();
-// #elif defined CONFIG_LV_USE_DEMO_STRESS
-//     lv_demo_stress();
-// #else
-// #error "No demo application selected."
-// #endif
-// #endif
-// } 
-
 static void lv_tick_task(void *arg)
 {
     (void)arg;
 
     lv_tick_inc(LV_TICK_PERIOD_MS);
 }
+
+/* function prototypes */
+static void pm2_5_value_refresher_task(lv_task_t *task_info);
+static void pm10_value_refresher_task(lv_task_t *task_info);
+static void voc_value_refresher_task(lv_task_t *task_info);
+static void temp_value_refresher_task(lv_task_t *task_info);
+static void hum_value_refresher_task(lv_task_t *task_info);
+
+/**
+ * @name    st7899_display_application
+ *  
+ * @brief   main function to initialize widget of the display and creates tasks to handle dynamic variables.       
+ */ 
+static void st7899_display_application()
+{
+    /* label object creation */
+    lv_obj_t *pm2_5_label = lv_label_create(lv_scr_act(), NULL);
+    lv_obj_t *pm10_label = lv_label_create(lv_scr_act(), NULL);
+    lv_obj_t *voc_label = lv_label_create(lv_scr_act(), NULL);
+    lv_obj_t *temp_label = lv_label_create(lv_scr_act(), NULL);
+    lv_obj_t *hum_label = lv_label_create(lv_scr_act(), NULL);
+
+
+    /* positioning labels on screen */
+    lv_obj_set_pos(pm2_5_label, 0, 0);
+    lv_obj_set_pos(pm10_label, 0, 15);
+    lv_obj_set_pos(voc_label, 0, 30);
+    lv_obj_set_pos(temp_label, 0, 45);
+    lv_obj_set_pos(hum_label, 0, 60);
+
+    /* task creation for dynamic value handling */
+    lv_task_create(pm2_5_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)pm2_5_label); /* task to update pm2.5 value on tft display */
+    lv_task_create(pm10_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)pm10_label);   /* task to update pm10 value on tft display */
+    lv_task_create(voc_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)voc_label);   /* task to update pm10 value on tft display */
+    lv_task_create(temp_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)temp_label);   /* task to update pm10 value on tft display */
+    lv_task_create(hum_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)hum_label);   /* task to update pm10 value on tft display */
+}
+
+/**
+ * @brief   callback function to update pm2.5 variable data on the display.
+ */ 
+void pm2_5_value_refresher_task(lv_task_t *task_info)
+{
+    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "PM2.5: %.02f", SPS30_PM2_5);
+}
+/**
+ * @brief   callback function to update pm10 variable data on the display.
+ */ 
+void pm10_value_refresher_task(lv_task_t *task_info)
+{
+    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "PM10: %.02f", SPS30_PM10);
+}
+/**
+ * @brief   callback function to update voc variable data on the display.
+ */ 
+void voc_value_refresher_task(lv_task_t *task_info)
+{
+    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "VOC: %.02f", SVM40_VOC);
+}
+/**
+ * @brief   callback function to update temp variable data on the display.
+ */ 
+void temp_value_refresher_task(lv_task_t *task_info)
+{
+    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "Temperature: %.02f degC", SVM40_TEMP);
+}
+/**
+ * @brief   callback function to update hum variable data on the display.
+ */ 
+void hum_value_refresher_task(lv_task_t *task_info)
+{
+    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "Humidity: %.02f%%", SVM40_HUM);
+}
+
+
+
+

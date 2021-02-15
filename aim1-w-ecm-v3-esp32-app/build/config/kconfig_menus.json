@@ -22353,7 +22353,7 @@
                     {
                         "children": [],
                         "depends_on": null,
-                        "help": "If the colors look inverted on your display, try enabling this.",
+                        "help": "If the colors look inverted on your display, try enabling this.\nIf it didn't help try LVGL configuration -> Swap the 2 bytes of RGB565 color.",
                         "id": "LV_INVERT_COLORS",
                         "name": "LV_INVERT_COLORS",
                         "range": null,

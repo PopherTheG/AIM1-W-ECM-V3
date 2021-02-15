@@ -1,1 +1,8 @@
-473de5bfd24d02836b70928fefa0d926a49f8ae3
+0000000000000000000000000000000000000000 02cb16e29cf8e60e73b061541656b4a37dcec98a PopherTheG <44886096+PopherTheG@users.noreply.github.com> 1610937200 +0800	commit (initial): first commit
+02cb16e29cf8e60e73b061541656b4a37dcec98a e3ac8c74421f1e3a7c888d583179bf846046486b PopherTheG <44886096+PopherTheG@users.noreply.github.com> 1610960719 +0800	commit: add OLED logging
+e3ac8c74421f1e3a7c888d583179bf846046486b 557caaa9aa9e8f1e9e3ed86d7bc4300b07e019dd PopherTheG <44886096+PopherTheG@users.noreply.github.com> 1611133374 +0800	commit: add oled algorithm
+557caaa9aa9e8f1e9e3ed86d7bc4300b07e019dd d4106db305ef584353b962a21099124110b6efd1 PopherTheG <44886096+PopherTheG@users.noreply.github.com> 1611219549 +0800	commit: realize decal on oled display
+d4106db305ef584353b962a21099124110b6efd1 efc70b79464335f9e2f69db54ef8b3788f90a939 PopherTheG <44886096+PopherTheG@users.noreply.github.com> 1611306350 +0800	commit: update UI of OLED
+efc70b79464335f9e2f69db54ef8b3788f90a939 07650b39fccdec1e03c46148dab73fca1c9d5cab PopherTheG <44886096+PopherTheG@users.noreply.github.com> 1611392633 +0800	commit: finalize ui and start UV sensor component
+07650b39fccdec1e03c46148dab73fca1c9d5cab 473de5bfd24d02836b70928fefa0d926a49f8ae3 PopherTheG <44886096+PopherTheG@users.noreply.github.com> 1612256667 +0800	commit: add svm40
+473de5bfd24d02836b70928fefa0d926a49f8ae3 97bf988590648f7ecc5940c2dd0997e99d4d50ce PopherTheG <44886096+PopherTheG@users.noreply.github.com> 1613181397 +0800	commit: add st7789 lvgl library

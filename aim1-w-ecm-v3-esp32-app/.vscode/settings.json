@@ -19,7 +19,10 @@
     "lvgl_helpers.h": "c",
     "lv_demo_printer.h": "c",
     "lv_demo_printer_theme.h": "c",
-    "lv_demo_stress.h": "c"
+    "lv_demo_stress.h": "c",
+    "st7789_gui.h": "c",
+    "ecm_gui.h": "c",
+    "*.ipp": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled"
 }

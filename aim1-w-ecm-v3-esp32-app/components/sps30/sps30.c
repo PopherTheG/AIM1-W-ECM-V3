@@ -242,3 +242,5 @@ sps30_read_version(struct sps30_version_information* version_information) {
 int16_t sps30_reset(void) {
     return sensirion_shdlc_tx(SPS30_ADDR, SPS30_CMD_RESET, 0, (uint8_t*)NULL);
 }
+
+
