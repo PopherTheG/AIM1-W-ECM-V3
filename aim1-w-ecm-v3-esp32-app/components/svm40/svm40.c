@@ -33,6 +33,125 @@
 #include "sensirion_sleep.h"
 #include "svm40_git_version.h"
 
+/* ESP32 related includes */
+#include "esp_log.h"
+#include "esp_system.h"
+#include "esp_timer.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_freertos_hooks.h"
+#include "freertos/semphr.h"
+#include "driver/gpio.h"
+#include "driver/uart.h"
+#include "driver/i2c.h"
+#include "driver/rmt.h"
+/* end */
+
+#define TAG "SVM40"
+
+void svm40_start_task()
+{
+    xTaskCreate(svm40_task, "svm40 task", 1024 * 2, NULL, 2, NULL);
+}
+
+static void svm40_task()
+{
+    int16_t error;
+    char serial_id[SVM40_MAX_SERIAL_LEN];
+
+    const char *driver_version = svm40_get_driver_version();
+    if (driver_version)
+    {
+        printf("SVM40 driver version %s\n", driver_version);
+    }
+    else
+    {
+        printf("fatal: Getting driver version failed\n");
+    }
+
+    /* Initialize I2C bus */
+    sensirion_i2c_init();
+
+    while (svm40_probe() != 0)
+    {
+        printf("SVM40 sensor probing failed\n");
+        sensirion_sleep_usec(1000000); /* wait 1s */
+    }
+    printf("SVM40 sensor probing successful\n");
+
+    error = svm40_get_serial(serial_id);
+    if (error != NO_ERROR)
+    {
+        printf("Error reading SVM40 serial: %i\n", error);
+    }
+    else
+    {
+        printf("Serial Number: %s\n", serial_id);
+    }
+
+    struct svm40_version_information version_information;
+    error = svm40_get_version(&version_information);
+    if (error)
+    {
+        printf("Error reading SVM40 version: %i\n", error);
+    }
+    else
+    {
+        if (version_information.firmware_debug)
+        {
+            printf("Development firmware version: ");
+        }
+        printf("FW: %u.%u, HW: %u.%u, protocol: %u.%u\n",
+               version_information.firmware_major,
+               version_information.firmware_minor,
+               version_information.hardware_major,
+               version_information.hardware_minor,
+               version_information.protocol_major,
+               version_information.protocol_minor);
+
+        // check if firmware is older than 2.2
+        if (version_information.firmware_major < 2 ||
+            (version_information.firmware_major == 2 &&
+             version_information.firmware_minor < 2))
+        {
+            printf("Warning: Old firmware version which may return constant "
+                   "values after a few hours of operation\n");
+        }
+    }
+
+    error = svm40_start_continuous_measurement();
+    if (error)
+    {
+        printf("Error starting measurement: %i\n", error);
+    }
+
+    while (1)
+    {
+        int16_t voc_index;
+        int16_t relative_humidity;
+        int16_t temperature;
+        sensirion_sleep_usec(SVM40_MEASUREMENT_INTERVAL_USEC); /* wait 1s */
+        error = svm40_read_measured_values_as_integers(
+            &voc_index, &relative_humidity, &temperature);
+        if (error)
+        {
+            ESP_LOGE(TAG, "SVM40: Error reading measurement values: %i", error);
+        }
+        else
+        {
+            ESP_LOGI(TAG, "SVM30: Measured values\n"
+                          "\t%.1f\n"
+                          "\t%.2f%%\n"
+                          "\t%.2f°C\n",
+                     voc_index / 10.0f, relative_humidity / 100.0f, temperature / 200.0f);
+            /* storing results in global variable */
+            SVM40_VOC = voc_index / 10.0f;
+            SVM40_HUM = relative_humidity / 100.0f;
+            SVM40_TEMP = temperature / 200.0f;
+        }
+    }
+}
+
 const char* svm40_get_driver_version(void) {
     return SVM40_DRV_VERSION_STR;
 }

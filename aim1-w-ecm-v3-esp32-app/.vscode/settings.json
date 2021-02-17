@@ -22,7 +22,9 @@
     "lv_demo_stress.h": "c",
     "st7789_gui.h": "c",
     "ecm_gui.h": "c",
-    "*.ipp": "c"
+    "*.ipp": "c",
+    "gui.h": "c",
+    "sensirion_common.h": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled"
 }

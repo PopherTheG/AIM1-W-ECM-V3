@@ -17,7 +17,8 @@
                 "C:/esp/esp-idf/components/newlib/platform_include",
                 "C:/esp/esp-idf/components/newlib/platform_include"
             ],
-            "compilerPath": "xtensa-esp32-elf-gcc"
+            "compilerPath": "xtensa-esp32-elf-gcc",
+            "compileCommands": "${workspaceFolder}/build/bootloader/compile_commands.json"
         }
     ],
     "version": 4

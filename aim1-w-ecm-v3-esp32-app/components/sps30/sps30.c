@@ -35,11 +35,29 @@
 #include "sps_git_version.h"
 #include "sensirion_common.h"
 
+/* ESP32 related includes */
+#include "esp_log.h"
+#include "esp_system.h"
+#include "esp_timer.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_freertos_hooks.h"
+#include "freertos/semphr.h"
+#include "driver/gpio.h"
+#include "driver/uart.h"
+#include "driver/i2c.h"
+#include "driver/rmt.h"
+/* end */
+
+#define TAG "SPS30"
+
 #define SPS30_ADDR 0x00
 #define SPS30_CMD_START_MEASUREMENT 0x00
 #define SPS30_CMD_STOP_MEASUREMENT 0x01
 #define SPS30_SUBCMD_MEASUREMENT_START \
-    { 0x01, 0x03 }
+    {                                  \
+        0x01, 0x03                     \
+    }
 #define SPS30_CMD_READ_MEASUREMENT 0x03
 #define SPS30_CMD_SLEEP 0x10
 #define SPS30_CMD_WAKE_UP 0x11
@@ -49,16 +67,158 @@
 #define SPS30_CMD_START_FAN_CLEANING 0x56
 #define SPS30_CMD_DEV_INFO 0xd0
 #define SPS30_CMD_DEV_INFO_SUBCMD_GET_SERIAL \
-    { 0x03 }
+    {                                        \
+        0x03                                 \
+    }
 #define SPS30_CMD_READ_VERSION 0xd1
 #define SPS30_CMD_RESET 0xd3
 #define SPS30_ERR_STATE(state) (SPS30_ERR_STATE_MASK | (state))
 
-const char* sps_get_driver_version(void) {
+void sps30_start_task()
+{
+    xTaskCreate(sps30_task, "sps30 task", 1024 * 4, NULL, 2, NULL);
+}
+
+static void sps30_task()
+{
+    struct sps30_measurement m;
+    char serial[SPS30_MAX_SERIAL_LEN];
+    const uint8_t AUTO_CLEAN_DAYS = 4;
+    int16_t ret;
+
+    while (sensirion_uart_open() != 0)
+    {
+        ESP_LOGE(TAG, "UART init failed");
+        sensirion_sleep_usec(1000000); /* sleep for 1s */
+    }
+
+    /* Busy loop for initialization, because the main loop does not work without
+     * a sensor.
+     */
+    while (sps30_probe() != 0)
+    {
+        ESP_LOGE(TAG, "SPS30: Sensor probing failed");
+        sensirion_sleep_usec(1000000); /* sleep for 1s */
+    }
+    ESP_LOGI(TAG, "SPS30: Sensor probing successful");
+
+    struct sps30_version_information version_information;
+    ret = sps30_read_version(&version_information);
+    if (ret)
+    {
+        ESP_LOGE(TAG, "SPS30: Error %d reading version information", ret);
+    }
+    else
+    {
+        ESP_LOGI(TAG, "SPS30: FW - %u.%u, HW - %u, SHDLC - %u.%u",
+                 version_information.firmware_major,
+                 version_information.firmware_minor,
+                 version_information.hardware_revision,
+                 version_information.shdlc_major,
+                 version_information.shdlc_minor);
+    }
+
+    ret = sps30_get_serial(serial);
+    if (ret)
+        ESP_LOGE(TAG, "SPS30: Error %d reading serial", ret);
+    else
+        ESP_LOGI(TAG, "SPS30: Serial - %s", serial);
+
+    ret = sps30_set_fan_auto_cleaning_interval_days(AUTO_CLEAN_DAYS);
+    if (ret)
+        ESP_LOGE(TAG, "SPS30: Error %d setting the auto-clean interval", ret);
+
+    while (1)
+    {
+        ret = sps30_start_measurement();
+        if (ret < 0)
+        {
+            ESP_LOGE(TAG, "SPS30: Error starting measurement");
+        }
+
+        ESP_LOGI(TAG, "SPS30: Measurements started");
+
+        for (int i = 0; i < 60; ++i)
+        {
+
+            ret = sps30_read_measurement(&m);
+            if (ret < 0)
+            {
+                ESP_LOGE(TAG, "SPS30: Error reading measurements");
+            }
+            else
+            {
+                if (SPS30_IS_ERR_STATE(ret))
+                {
+                    ESP_LOGW(TAG, "SPS30: Chip State %u - measurements may not be accurate",
+                             SPS30_GET_ERR_STATE(ret));
+                }
+
+                /* Output measured data from SPS30 */
+                ESP_LOGI(TAG, "SPS30: Measured Values\n"
+                              "\t%0.2f pm1.0\n"
+                              "\t%0.2f pm2.5\n"
+                              "\t%0.2f pm4.0\n"
+                              "\t%0.2f pm10.0\n"
+                              "\t%0.2f nc0.5\n"
+                              "\t%0.2f nc1.0\n"
+                              "\t%0.2f nc2.5\n"
+                              "\t%0.2f nc4.5\n"
+                              "\t%0.2f nc10.0\n"
+                              "\t%0.2f typical particle size\n\n",
+                         m.mc_1p0, m.mc_2p5, m.mc_4p0, m.mc_10p0, m.nc_0p5,
+                         m.nc_1p0, m.nc_2p5, m.nc_4p0, m.nc_10p0,
+                         m.typical_particle_size);
+
+                /* storing results */
+                SPS30_PM2_5 = m.mc_2p5;
+                SPS30_PM10 = m.mc_10p0;
+            }
+            sensirion_sleep_usec(1000000); /* sleep for 1s */
+        }
+
+        /* Stop measurement for 1min to preserve power. Also enter sleep mode
+         * if the firmware version is >=2.0.
+         */
+        ret = sps30_stop_measurement();
+        if (ret)
+        {
+            ESP_LOGE(TAG, "SPS30: Stopping measurement failed");
+        }
+
+        if (version_information.firmware_major >= 2)
+        {
+            ret = sps30_sleep();
+            if (ret)
+            {
+                ESP_LOGE(TAG, "SPS30: Entering sleep failed");
+            }
+        }
+
+        ESP_LOGI(TAG, "SPS30: No measurements for 1 minute");
+        sensirion_sleep_usec(1000000 * 60); /* adjustment for sleep time */
+
+        if (version_information.firmware_major >= 2)
+        {
+            ret = sps30_wake_up();
+            if (ret)
+            {
+                // printf("Error %i waking up sensor\n", ret);
+                ESP_LOGE(TAG, "SPS30: Error %i waking up sensor", ret);
+            }
+        }
+    }
+    if (sensirion_uart_close() != 0)
+        ESP_LOGE(TAG, "SPS30: Failed to close UART");
+}
+
+const char *sps_get_driver_version(void)
+{
     return SPS_DRV_VERSION_STR;
 }
 
-int16_t sps30_probe(void) {
+int16_t sps30_probe(void)
+{
     char serial[SPS30_MAX_SERIAL_LEN];
     // Try to wake up, but ignore failure if it is not in sleep mode
     (void)sps30_wake_up();
@@ -67,14 +227,15 @@ int16_t sps30_probe(void) {
     return ret;
 }
 
-int16_t sps30_get_serial(char* serial) {
+int16_t sps30_get_serial(char *serial)
+{
     struct sensirion_shdlc_rx_header header;
     uint8_t param_buf[] = SPS30_CMD_DEV_INFO_SUBCMD_GET_SERIAL;
     int16_t ret;
 
     ret = sensirion_shdlc_xcv(SPS30_ADDR, SPS30_CMD_DEV_INFO, sizeof(param_buf),
                               param_buf, SPS30_MAX_SERIAL_LEN, &header,
-                              (uint8_t*)serial);
+                              (uint8_t *)serial);
     if (ret < 0)
         return ret;
 
@@ -84,35 +245,40 @@ int16_t sps30_get_serial(char* serial) {
     return 0;
 }
 
-int16_t sps30_start_measurement(void) {
+int16_t sps30_start_measurement(void)
+{
     struct sensirion_shdlc_rx_header header;
     uint8_t param_buf[] = SPS30_SUBCMD_MEASUREMENT_START;
 
     return sensirion_shdlc_xcv(SPS30_ADDR, SPS30_CMD_START_MEASUREMENT,
                                sizeof(param_buf), param_buf, 0, &header,
-                               (uint8_t*)NULL);
+                               (uint8_t *)NULL);
 }
 
-int16_t sps30_stop_measurement(void) {
+int16_t sps30_stop_measurement(void)
+{
     struct sensirion_shdlc_rx_header header;
 
     return sensirion_shdlc_xcv(SPS30_ADDR, SPS30_CMD_STOP_MEASUREMENT, 0,
-                               (uint8_t*)NULL, 0, &header, (uint8_t*)NULL);
+                               (uint8_t *)NULL, 0, &header, (uint8_t *)NULL);
 }
 
-int16_t sps30_read_measurement(struct sps30_measurement* measurement) {
+int16_t sps30_read_measurement(struct sps30_measurement *measurement)
+{
     struct sensirion_shdlc_rx_header header;
     int16_t error;
     uint8_t data[10][4];
 
     error = sensirion_shdlc_xcv(SPS30_ADDR, SPS30_CMD_READ_MEASUREMENT, 0,
-                                (uint8_t*)NULL, sizeof(data), &header,
-                                (uint8_t*)data);
-    if (error) {
+                                (uint8_t *)NULL, sizeof(data), &header,
+                                (uint8_t *)data);
+    if (error)
+    {
         return error;
     }
 
-    if (header.data_len != sizeof(data)) {
+    if (header.data_len != sizeof(data))
+    {
         return SPS30_ERR_NOT_ENOUGH_DATA;
     }
 
@@ -127,34 +293,39 @@ int16_t sps30_read_measurement(struct sps30_measurement* measurement) {
     measurement->nc_10p0 = sensirion_bytes_to_float(data[8]);
     measurement->typical_particle_size = sensirion_bytes_to_float(data[9]);
 
-    if (header.state) {
+    if (header.state)
+    {
         return SPS30_ERR_STATE(header.state);
     }
 
     return 0;
 }
 
-int16_t sps30_sleep(void) {
+int16_t sps30_sleep(void)
+{
     struct sensirion_shdlc_rx_header header;
 
-    return sensirion_shdlc_xcv(SPS30_ADDR, SPS30_CMD_SLEEP, 0, (uint8_t*)NULL,
-                               0, &header, (uint8_t*)NULL);
+    return sensirion_shdlc_xcv(SPS30_ADDR, SPS30_CMD_SLEEP, 0, (uint8_t *)NULL,
+                               0, &header, (uint8_t *)NULL);
 }
 
-int16_t sps30_wake_up(void) {
+int16_t sps30_wake_up(void)
+{
     struct sensirion_shdlc_rx_header header;
     int16_t ret;
     const uint8_t data = 0xFF;
 
     ret = sensirion_uart_tx(1, &data);
-    if (ret < 0) {
+    if (ret < 0)
+    {
         return ret;
     }
-    return sensirion_shdlc_xcv(SPS30_ADDR, SPS30_CMD_WAKE_UP, 0, (uint8_t*)NULL,
-                               0, &header, (uint8_t*)NULL);
+    return sensirion_shdlc_xcv(SPS30_ADDR, SPS30_CMD_WAKE_UP, 0, (uint8_t *)NULL,
+                               0, &header, (uint8_t *)NULL);
 }
 
-int16_t sps30_get_fan_auto_cleaning_interval(uint32_t* interval_seconds) {
+int16_t sps30_get_fan_auto_cleaning_interval(uint32_t *interval_seconds)
+{
     struct sensirion_shdlc_rx_header header;
     uint8_t tx_data[] = {SPS30_SUBCMD_READ_FAN_CLEAN_INTV};
     int16_t ret;
@@ -162,7 +333,7 @@ int16_t sps30_get_fan_auto_cleaning_interval(uint32_t* interval_seconds) {
 
     ret = sensirion_shdlc_xcv(
         SPS30_ADDR, SPS30_CMD_FAN_CLEAN_INTV, sizeof(tx_data), tx_data,
-        sizeof(*interval_seconds), &header, (uint8_t*)data);
+        sizeof(*interval_seconds), &header, (uint8_t *)data);
     if (ret < 0)
         return ret;
 
@@ -174,7 +345,8 @@ int16_t sps30_get_fan_auto_cleaning_interval(uint32_t* interval_seconds) {
     return 0;
 }
 
-int16_t sps30_set_fan_auto_cleaning_interval(uint32_t interval_seconds) {
+int16_t sps30_set_fan_auto_cleaning_interval(uint32_t interval_seconds)
+{
     struct sensirion_shdlc_rx_header header;
     uint8_t cleaning_command[SPS30_CMD_FAN_CLEAN_INTV_LEN];
 
@@ -183,10 +355,11 @@ int16_t sps30_set_fan_auto_cleaning_interval(uint32_t interval_seconds) {
 
     return sensirion_shdlc_xcv(SPS30_ADDR, SPS30_CMD_FAN_CLEAN_INTV,
                                sizeof(cleaning_command), cleaning_command, 0,
-                               &header, (uint8_t*)NULL);
+                               &header, (uint8_t *)NULL);
 }
 
-int16_t sps30_get_fan_auto_cleaning_interval_days(uint8_t* interval_days) {
+int16_t sps30_get_fan_auto_cleaning_interval_days(uint8_t *interval_days)
+{
     int16_t ret;
     uint32_t interval_seconds;
 
@@ -198,35 +371,41 @@ int16_t sps30_get_fan_auto_cleaning_interval_days(uint8_t* interval_days) {
     return ret;
 }
 
-int16_t sps30_set_fan_auto_cleaning_interval_days(uint8_t interval_days) {
+int16_t sps30_set_fan_auto_cleaning_interval_days(uint8_t interval_days)
+{
     return sps30_set_fan_auto_cleaning_interval((uint32_t)interval_days * 24 *
                                                 60 * 60);
 }
 
-int16_t sps30_start_manual_fan_cleaning(void) {
+int16_t sps30_start_manual_fan_cleaning(void)
+{
     struct sensirion_shdlc_rx_header header;
 
     return sensirion_shdlc_xcv(SPS30_ADDR, SPS30_CMD_START_FAN_CLEANING, 0,
-                               (uint8_t*)NULL, 0, &header, (uint8_t*)NULL);
+                               (uint8_t *)NULL, 0, &header, (uint8_t *)NULL);
 }
 
 int16_t
-sps30_read_version(struct sps30_version_information* version_information) {
+sps30_read_version(struct sps30_version_information *version_information)
+{
     struct sensirion_shdlc_rx_header header;
     int16_t error;
     uint8_t data[7];
 
     error = sensirion_shdlc_xcv(SPS30_ADDR, SPS30_CMD_READ_VERSION, 0,
-                                (uint8_t*)NULL, sizeof(data), &header, data);
-    if (error) {
+                                (uint8_t *)NULL, sizeof(data), &header, data);
+    if (error)
+    {
         return error;
     }
 
-    if (header.data_len != sizeof(data)) {
+    if (header.data_len != sizeof(data))
+    {
         return SPS30_ERR_NOT_ENOUGH_DATA;
     }
 
-    if (header.state) {
+    if (header.state)
+    {
         return SPS30_ERR_STATE(header.state);
     }
 
@@ -239,8 +418,7 @@ sps30_read_version(struct sps30_version_information* version_information) {
     return error;
 }
 
-int16_t sps30_reset(void) {
-    return sensirion_shdlc_tx(SPS30_ADDR, SPS30_CMD_RESET, 0, (uint8_t*)NULL);
+int16_t sps30_reset(void)
+{
+    return sensirion_shdlc_tx(SPS30_ADDR, SPS30_CMD_RESET, 0, (uint8_t *)NULL);
 }
-
-

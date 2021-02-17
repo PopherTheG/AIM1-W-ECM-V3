@@ -57,6 +57,22 @@ extern "C" {
 #define SVM40_STOP_MEASUREMENT_DELAY 50000
 #define SVM40_DEVICE_RESET_DELAY 100000
 
+extern float SVM40_VOC;
+extern float SVM40_TEMP;
+extern float SVM40_HUM;
+
+/**
+ * svm40_task_start()
+ * @brief   create FreeRTOS task
+ */ 
+void svm40_start_task();
+
+/**
+ * @name svm40_task
+ * @brief configure task for svm40 to retrieve sensor data.
+ */  
+static void svm40_task();
+
 /**
  * Check if SVM40 sensor is available
  *

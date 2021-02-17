@@ -44,6 +44,9 @@ extern "C" {
 #define SPS30_IS_ERR_STATE(err_code) (((err_code) | 0xff) == 0x1ff)
 #define SPS30_GET_ERR_STATE(err_code) ((err_code)&0xff)
 
+extern float SPS30_PM2_5;
+extern float SPS30_PM10;
+
 struct sps30_measurement {
     float mc_1p0;
     float mc_2p5;
@@ -64,6 +67,16 @@ struct sps30_version_information {
     uint8_t shdlc_major;
     uint8_t shdlc_minor;
 };
+
+/**
+ * sps30_start_task() - start sps30 task
+ */
+void sps30_start_task(); 
+
+/**
+ * sps30_task() - create a task for sps30 which reads sensor data
+ */ 
+static void sps30_task();
 
 /**
  * sps_get_driver_version() - Return the driver version
