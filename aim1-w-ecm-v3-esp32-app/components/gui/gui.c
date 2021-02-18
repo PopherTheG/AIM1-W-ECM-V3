@@ -184,6 +184,12 @@ void st7899_display_application()
     lv_style_set_border_color(&voc_icon_box_style, LV_STATE_DEFAULT, border_color);
     lv_obj_add_style(voc_icon_box, LV_OBJ_PART_MAIN, &voc_icon_box_style);
 
+    lv_obj_t *voc_icon = lv_img_create(voc_icon_box, NULL);
+    lv_img_set_src(voc_icon, LV_SYMBOL_OK);
+    lv_img_set_auto_size(voc_icon, true);
+    lv_obj_set_size(voc_icon, 57, 57);
+    lv_obj_align(voc_icon, voc_icon_box, LV_ALIGN_IN_TOP_LEFT, 0, 0);
+
     lv_obj_t *voc_label_box = lv_obj_create(voc_box, NULL);
     lv_obj_set_size(voc_label_box, 230 - 57.5, 57.5/3);
     lv_obj_align(voc_label_box, voc_box, LV_ALIGN_IN_TOP_RIGHT, 0, 0);
