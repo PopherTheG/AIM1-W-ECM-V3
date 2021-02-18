@@ -9,7 +9,6 @@
 #endif
 
 #include "lvgl_helpers.h"
-
 #ifndef CONFIG_LV_TFT_DISPLAY_MONOCHROME
 #if defined CONFIG_LV_USE_DEMO_WIDGETS
 #include "lv_examples/src/lv_demo_widgets/lv_demo_widgets.h"

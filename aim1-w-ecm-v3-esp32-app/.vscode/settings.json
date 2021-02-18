@@ -24,7 +24,10 @@
     "ecm_gui.h": "c",
     "*.ipp": "c",
     "gui.h": "c",
-    "sensirion_common.h": "c"
+    "sensirion_common.h": "c",
+    "lv_refr.h": "c",
+    "lv_group.h": "c",
+    "lv_obj.h": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled"
 }
