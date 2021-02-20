@@ -133,28 +133,22 @@ static void co2_led_value_refresher_task(lv_task_t *task_info);
 
 static lv_style_t screen_style;
 
+static lv_style_t overall_indicator_bar_style;
 
 static lv_style_t voc_value_style;
 static lv_style_t voc_bar_style;
 
-static lv_style_t co2_box_style;
-static lv_style_t co2_label_style;
 static lv_style_t co2_value_style;
 static lv_style_t co2_bar_style;
 
-static lv_style_t pm2_5_box_style;
-static lv_style_t pm2_5_label_style;
 static lv_style_t pm2_5_value_style;
 static lv_style_t pm2_5_bar_style;
 
-static lv_style_t pm10_box_style;
-static lv_style_t pm10_label_style;
 static lv_style_t pm10_value_style;
 static lv_style_t pm10_bar_style;
 
 static lv_style_t temp_value_style;
 static lv_style_t temp_box_style;
-
 
 static lv_style_t hum_value_style;
 static lv_style_t hum_box_style;
@@ -173,6 +167,8 @@ void st7899_display_application()
 
     int8_t bar_x_offset = -10;
     int8_t bar_y_offset = 8;
+    int8_t row2_y_offset = 110;
+    int8_t row1_y_offset = 40;
 
     /* logo */
     // lv_obj_t *logo_box = lv_obj_create(lv_scr_act(), NULL);
@@ -187,11 +183,28 @@ void st7899_display_application()
     // lv_obj_t *logo_icon = lv_img_create(logo_box, NULL);
     // lv_img_set_src(logo_icon, &logo_img_src);
     // lv_obj_align(logo_icon, logo_box, LV_ALIGN_CENTER, 0, -3);
+    /* indicator */
+    lv_obj_t *overall_indicator_bar = lv_bar_create(lv_scr_act(), NULL);
+    lv_obj_set_size(overall_indicator_bar, 230, 30);
+    lv_obj_align(overall_indicator_bar, lv_scr_act(), LV_ALIGN_IN_TOP_MID, 0, 0);
+    lv_bar_set_value(overall_indicator_bar, 100, LV_ANIM_OFF);
+    lv_style_init(&overall_indicator_bar_style);  
+    lv_style_set_bg_color(&overall_indicator_bar_style, LV_STATE_DEFAULT, LV_COLOR_RED);
+    lv_obj_add_style(overall_indicator_bar, LV_BAR_PART_INDIC, &overall_indicator_bar_style);
+
+    lv_obj_t *overall_indicator_value = lv_label_create(overall_indicator_bar, NULL);
+    lv_obj_align(overall_indicator_value, overall_indicator_bar, LV_ALIGN_IN_TOP_LEFT, 32, 0);
+    lv_label_set_text(overall_indicator_value, "UNHEALTHY");
+    static lv_style_t overall_indicator_value_style;
+    lv_style_init(&overall_indicator_value_style);
+    lv_style_set_text_color(&overall_indicator_value_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    lv_style_set_text_font(&overall_indicator_value_style, LV_STATE_DEFAULT, &lv_font_montserrat_24);
+    lv_obj_add_style(overall_indicator_value, LV_OBJ_PART_MAIN, &overall_indicator_value_style);
 
     /* voc */
     lv_obj_t *voc_box = lv_obj_create(lv_scr_act(), NULL);
     lv_obj_set_size(voc_box, 230/2, 230/4);
-    lv_obj_align(voc_box, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 5, 25);
+    lv_obj_align(voc_box, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, row1_y_offset);
     static lv_style_t voc_box_style;
     lv_style_init(&voc_box_style);
     lv_style_set_bg_color(&voc_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
@@ -231,7 +244,7 @@ void st7899_display_application()
     /* co2 */
     lv_obj_t *co2_box = lv_obj_create(lv_scr_act(), NULL);
     lv_obj_set_size(co2_box, 230/2, 230/4);
-    lv_obj_align(co2_box, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, (230/2)+5, 25);
+    lv_obj_align(co2_box, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, (230/2)+10, row1_y_offset);
     static lv_style_t co2_box_style;
     lv_style_init(&co2_box_style);
     lv_style_set_bg_color(&co2_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
@@ -245,7 +258,6 @@ void st7899_display_application()
     lv_obj_t *co2_value = lv_label_create(co2_box, NULL);
     lv_label_set_text(co2_value, "333");
     lv_obj_align(co2_value, co2_box, LV_ALIGN_IN_TOP_LEFT, 30, 0);
-    static lv_style_t co2_value_style;
     lv_style_init(&co2_value_style);
     lv_style_set_text_font(&co2_value_style, LV_STATE_DEFAULT, &lv_font_montserrat_28);
     lv_style_set_text_color(&co2_value_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
@@ -271,7 +283,7 @@ void st7899_display_application()
     /* temp */
     lv_obj_t *temp_box = lv_obj_create(lv_scr_act(), NULL);
     lv_obj_set_size(temp_box, 230/2, 230/4);
-    lv_obj_align(temp_box, lv_scr_act(), LV_ALIGN_IN_LEFT_MID, 5, 0);
+    lv_obj_align(temp_box, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, row2_y_offset);
     static lv_style_t temp_box_style;
     lv_style_init(&temp_box_style);
     lv_style_set_bg_color(&temp_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
@@ -283,7 +295,7 @@ void st7899_display_application()
     lv_obj_align(temp_icon, temp_box, LV_ALIGN_IN_TOP_LEFT, 3, 3);
 
     lv_obj_t *temp_value = lv_label_create(temp_box, NULL);
-    lv_label_set_text(temp_value, "25.4°C");
+    lv_label_set_text(temp_value, "25.4C");
     lv_obj_align(temp_value, temp_box, LV_ALIGN_IN_TOP_LEFT, 30, 0);
     static lv_style_t temp_value_style;
     lv_style_init(&temp_value_style);
@@ -303,7 +315,7 @@ void st7899_display_application()
     /* hum */
     lv_obj_t *hum_box = lv_obj_create(lv_scr_act(), NULL);
     lv_obj_set_size(hum_box, 230/2, 230/4);
-    lv_obj_align(hum_box, lv_scr_act(), LV_ALIGN_IN_LEFT_MID, (230/2)+5, 0);
+    lv_obj_align(hum_box, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, (230/2)+10, row2_y_offset);
     static lv_style_t hum_box_style;
     lv_style_init(&hum_box_style);
     lv_style_set_bg_color(&hum_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
@@ -335,7 +347,7 @@ void st7899_display_application()
     /* pm2.5 */
     lv_obj_t *pm2_5_box = lv_obj_create(lv_scr_act(), NULL);
     lv_obj_set_size(pm2_5_box, 230/2, 230/4);
-    lv_obj_align(pm2_5_box, lv_scr_act(), LV_ALIGN_IN_BOTTOM_LEFT, 5, -25);
+    lv_obj_align(pm2_5_box, lv_scr_act(), LV_ALIGN_IN_BOTTOM_LEFT, 0, -5);
     static lv_style_t pm2_5_box_style;
     lv_style_init(&pm2_5_box_style);
     lv_style_set_bg_color(&pm2_5_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
@@ -347,12 +359,12 @@ void st7899_display_application()
     lv_obj_align(pm2_5_icon, pm2_5_box, LV_ALIGN_IN_TOP_LEFT, 3, 6);
 
     lv_obj_t *pm2_5_value = lv_label_create(pm2_5_box, NULL);
-    lv_label_set_text(pm2_5_value, "N/A");
+    lv_label_set_text(pm2_5_value, "na");
     lv_obj_align(pm2_5_value, pm2_5_box, LV_ALIGN_IN_TOP_LEFT, 30, 0);
     static lv_style_t pm2_5_value_style;
     lv_style_init(&pm2_5_value_style);
     lv_style_set_text_font(&pm2_5_value_style, LV_STATE_DEFAULT, &lv_font_montserrat_28);
-    lv_style_set_text_color(&pm2_5_value_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    lv_style_set_text_color(&pm2_5_value_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
     lv_obj_add_style(pm2_5_value, LV_OBJ_PART_MAIN, &pm2_5_value_style);
 
     lv_obj_t *pm2_5_bar = lv_bar_create(pm2_5_box, NULL);
@@ -369,14 +381,14 @@ void st7899_display_application()
     static lv_style_t pm2_5_label_style;
     lv_style_init(&pm2_5_label_style);
     lv_style_set_text_font(&pm2_5_label_style, LV_STATE_DEFAULT, &lv_font_montserrat_14);
-    lv_style_set_text_color(&pm2_5_label_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    lv_style_set_text_color(&pm2_5_label_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
     lv_obj_add_style(pm2_5_label, LV_OBJ_PART_MAIN, &pm2_5_label_style);
 
 
     /* pm10 */
     lv_obj_t *pm10_box = lv_obj_create(lv_scr_act(), NULL);
     lv_obj_set_size(pm10_box, 230/2, 230/4);
-    lv_obj_align(pm10_box, lv_scr_act(), LV_ALIGN_IN_BOTTOM_LEFT, (230/2)+5, -25);
+    lv_obj_align(pm10_box, lv_scr_act(), LV_ALIGN_IN_BOTTOM_LEFT, (230/2)+10, -5);
     static lv_style_t pm10_box_style;
     lv_style_init(&pm10_box_style);
     lv_style_set_bg_color(&pm10_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
@@ -388,12 +400,12 @@ void st7899_display_application()
     lv_obj_align(pm10_icon, pm10_box, LV_ALIGN_IN_TOP_LEFT, 3, 6);
 
     lv_obj_t *pm10_value = lv_label_create(pm10_box, NULL);
-    lv_label_set_text(pm10_value, "N/A");
+    lv_label_set_text(pm10_value, "na");
     lv_obj_align(pm10_value, pm10_box, LV_ALIGN_IN_TOP_LEFT, 30, 0);
     static lv_style_t pm10_value_style;
     lv_style_init(&pm10_value_style);
     lv_style_set_text_font(&pm10_value_style, LV_STATE_DEFAULT, &lv_font_montserrat_28);
-    lv_style_set_text_color(&pm10_value_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    lv_style_set_text_color(&pm10_value_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
     lv_obj_add_style(pm10_value, LV_OBJ_PART_MAIN, &pm10_value_style);
 
     lv_obj_t *pm10_bar = lv_bar_create(pm10_box, NULL);
@@ -410,7 +422,7 @@ void st7899_display_application()
     static lv_style_t pm10_label_style;
     lv_style_init(&pm10_label_style);
     lv_style_set_text_font(&pm10_label_style, LV_STATE_DEFAULT, &lv_font_montserrat_14);
-    lv_style_set_text_color(&pm10_label_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    lv_style_set_text_color(&pm10_label_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
     lv_obj_add_style(pm10_label, LV_OBJ_PART_MAIN, &pm10_label_style);
     /* new new new end */
 
@@ -549,7 +561,7 @@ static void co2_led_value_refresher_task(lv_task_t *task_info)
 static void temp_label_value_refresher_task(lv_task_t *task_info)
 {
     /* update label value */
-    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "%.01f°C", SVM40_TEMP);
+    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "%.01fC", SVM40_TEMP);
 }
 /**
  * @brief   callback function to update hum label data on the display.
@@ -557,12 +569,11 @@ static void temp_label_value_refresher_task(lv_task_t *task_info)
 static void hum_label_value_refresher_task(lv_task_t *task_info)
 {
     /* update label value */
-    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "%.01f%%RH", SVM40_HUM);
+    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "%.01f%%", SVM40_HUM);
 }
 
 static void lv_tick_task(void *arg)
 {
     (void)arg;
-
     lv_tick_inc(LV_TICK_PERIOD_MS);
 }
