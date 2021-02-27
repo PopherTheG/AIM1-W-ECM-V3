@@ -167,8 +167,8 @@ void st7899_display_application()
     lv_color_t temp_border_color = LV_COLOR_WHITE;
     lv_color_t voc_border_color = LV_COLOR_GREEN;
     lv_color_t co2_border_color = LV_COLOR_GREEN;
-    lv_color_t pm2_5_border_color = LV_COLOR_GRAY;
-    lv_color_t pm10_border_color = LV_COLOR_GRAY;
+    lv_color_t pm2_5_border_color = LV_COLOR_GREEN;
+    lv_color_t pm10_border_color = LV_COLOR_GREEN;
 
     int8_t bar_x_offset = -10;
     int8_t bar_y_offset = 8;
@@ -463,6 +463,8 @@ void st7899_display_application()
     lv_style_set_bg_color(&hum_bar_style, LV_STATE_DEFAULT, LV_COLOR_GREEN);
     lv_obj_add_style(hum_bar, LV_BAR_PART_INDIC, &hum_bar_style);
 
+#define PM_SENSORS_INSTALLED
+#ifdef PM_SENSORS_INSTALLED
     /* pm2.5 */
     lv_obj_t *pm2_5_box = lv_obj_create(lv_scr_act(), NULL);
     lv_obj_set_size(pm2_5_box, 230 / 2, 230 / 4);
@@ -473,19 +475,18 @@ void st7899_display_application()
     lv_style_set_border_color(&pm2_5_box_style, LV_STATE_DEFAULT, pm2_5_border_color);
     lv_obj_add_style(pm2_5_box, LV_OBJ_PART_MAIN, &pm2_5_box_style);
 
-// lv_obj_t *pm2_5_icon = lv_img_create(pm2_5_box, NULL);
-// lv_img_set_src(pm2_5_icon, &dust_img_src);
-// lv_obj_align(pm2_5_icon, pm2_5_box, LV_ALIGN_IN_TOP_LEFT, 3, 6);
-#define PM_SENSORS_INSTALLED
-#ifdef PM_SENSORS_INSTALLED
+    // lv_obj_t *pm2_5_icon = lv_img_create(pm2_5_box, NULL);
+    // lv_img_set_src(pm2_5_icon, &dust_img_src);
+    // lv_obj_align(pm2_5_icon, pm2_5_box, LV_ALIGN_IN_TOP_LEFT, 3, 6);
+
     lv_obj_t *pm2_5_value = lv_label_create(pm2_5_box, NULL);
-    lv_label_set_text(pm2_5_value, "na");
+    lv_label_set_text(pm2_5_value, "10.7");
     lv_obj_align(pm2_5_value, pm2_5_box, LV_ALIGN_IN_TOP_LEFT, 3, 0);
     // lv_obj_align(pm2_5_value, pm2_5_box, LV_ALIGN_IN_TOP_LEFT, 30, 0);
     static lv_style_t pm2_5_value_style;
     lv_style_init(&pm2_5_value_style);
     lv_style_set_text_font(&pm2_5_value_style, LV_STATE_DEFAULT, &lv_font_montserrat_28);
-    lv_style_set_text_color(&pm2_5_value_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_style_set_text_color(&pm2_5_value_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_obj_add_style(pm2_5_value, LV_OBJ_PART_MAIN, &pm2_5_value_style);
 
     lv_obj_t *pm2_5_bar = lv_bar_create(pm2_5_box, NULL);
@@ -497,12 +498,12 @@ void st7899_display_application()
     lv_obj_add_style(pm2_5_bar, LV_BAR_PART_INDIC, &pm2_5_bar_style);
 
     lv_obj_t *pm2_5_label = lv_label_create(pm2_5_box, NULL);
-    lv_label_set_text(pm2_5_label, "PM2.5 (ug/m³)");
+    lv_label_set_text(pm2_5_label, "PM2.5 (ug/m3)");
     lv_obj_align(pm2_5_label, pm2_5_box, LV_ALIGN_IN_BOTTOM_LEFT, 3, 0);
     static lv_style_t pm2_5_label_style;
     lv_style_init(&pm2_5_label_style);
-    lv_style_set_text_font(&pm2_5_label_style, LV_STATE_DEFAULT, &lv_font_montserrat_14);
-    lv_style_set_text_color(&pm2_5_label_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_style_set_text_font(&pm2_5_label_style, LV_STATE_DEFAULT, &lv_font_montserrat_12);
+    lv_style_set_text_color(&pm2_5_label_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_obj_add_style(pm2_5_label, LV_OBJ_PART_MAIN, &pm2_5_label_style);
 
     lv_obj_t *pm2_5_unit = lv_label_create(pm2_5_box, NULL);
@@ -529,13 +530,13 @@ void st7899_display_application()
     // lv_obj_align(pm10_icon, pm10_box, LV_ALIGN_IN_TOP_LEFT, 3, 6);
 
     lv_obj_t *pm10_value = lv_label_create(pm10_box, NULL);
-    lv_label_set_text(pm10_value, "na");
+    lv_label_set_text(pm10_value, "9.7");
     // lv_obj_align(pm10_value, pm10_box, LV_ALIGN_IN_TOP_LEFT, 30, 0);
     lv_obj_align(pm10_value, pm10_box, LV_ALIGN_IN_TOP_LEFT, 3, 0);
     static lv_style_t pm10_value_style;
     lv_style_init(&pm10_value_style);
     lv_style_set_text_font(&pm10_value_style, LV_STATE_DEFAULT, &lv_font_montserrat_28);
-    lv_style_set_text_color(&pm10_value_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_style_set_text_color(&pm10_value_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_obj_add_style(pm10_value, LV_OBJ_PART_MAIN, &pm10_value_style);
 
     lv_obj_t *pm10_bar = lv_bar_create(pm10_box, NULL);
@@ -552,7 +553,7 @@ void st7899_display_application()
     static lv_style_t pm10_label_style;
     lv_style_init(&pm10_label_style);
     lv_style_set_text_font(&pm10_label_style, LV_STATE_DEFAULT, &lv_font_montserrat_14);
-    lv_style_set_text_color(&pm10_label_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_style_set_text_color(&pm10_label_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_obj_add_style(pm10_label, LV_OBJ_PART_MAIN, &pm10_label_style);
 
     lv_obj_t *pm10_unit = lv_label_create(pm10_box, NULL);
@@ -564,6 +565,16 @@ void st7899_display_application()
     lv_style_set_text_color(&pm10_unit_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
     lv_obj_add_style(pm10_unit, LV_OBJ_PART_MAIN, &pm10_unit_style);
 #else
+    /* pm2.5 */
+    lv_obj_t *pm2_5_box = lv_obj_create(lv_scr_act(), NULL);
+    lv_obj_set_size(pm2_5_box, 230 / 2, 230 / 4);
+    lv_obj_align(pm2_5_box, lv_scr_act(), LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
+    static lv_style_t pm2_5_box_style;
+    lv_style_init(&pm2_5_box_style);
+    lv_style_set_bg_color(&pm2_5_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    lv_style_set_border_color(&pm2_5_box_style, LV_STATE_DEFAULT, pm2_5_border_color);
+    lv_obj_add_style(pm2_5_box, LV_OBJ_PART_MAIN, &pm2_5_box_style);
+
     lv_obj_t *pm2_5_value = lv_label_create(pm2_5_box, NULL);
     lv_label_set_text(pm2_5_value, "na");
     lv_obj_align(pm2_5_value, pm2_5_box, LV_ALIGN_IN_TOP_LEFT, 3, 0);
