@@ -33,6 +33,13 @@ extern float SVM40_HUM;
 extern float SVM40_TEMP;
 extern float SCD4x_CO2;
 
+#define LV_COLOR_GOOD                               LV_COLOR_MAKE(0x28, 0x96, 0x3C)
+#define LV_COLOR_MODERATE                           LV_COLOR_MAKE(0xF8, 0xFB, 0x89)
+#define LV_COLOR_UNHEALTHY_FOR_SENSITIVE_GROUPS     LV_COLOR_MAKE(0xF6, 0xC1, 0x42)
+#define LV_COLOR_UNHEALTHY                          LV_COLOR_MAKE(0xDC, 0x84, 0x42)
+#define LV_COLOR_VERY_UNHEALTHY                     LV_COLOR_MAKE(0xED, 0x64, 0x74)
+#define LV_COLOR_HAZARDOUS                          LV_COLOR_MAKE(0xEB, 0x32, 0x23)
+
 void gui_start_task();
 static void lv_tick_task(void *arg);
 static void guiTask(void *pvParameters);

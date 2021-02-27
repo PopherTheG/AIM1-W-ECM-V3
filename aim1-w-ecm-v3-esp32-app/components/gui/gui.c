@@ -152,7 +152,7 @@ static lv_style_t temp_box_style;
 
 static lv_style_t hum_value_style;
 static lv_style_t hum_box_style;
-
+static lv_style_t hum_bar_style;
 
 void st7899_display_application()
 {
@@ -162,13 +162,18 @@ void st7899_display_application()
     lv_style_init(&screen_style);
     lv_style_set_bg_color(&screen_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     lv_obj_add_style(screen, LV_OBJ_PART_MAIN, &screen_style);
-    
-    lv_color_t box_border_color = LV_COLOR_BLACK; 
+
+    lv_color_t hum_border_color = LV_COLOR_GREEN;
+    lv_color_t temp_border_color = LV_COLOR_WHITE;
+    lv_color_t voc_border_color = LV_COLOR_GREEN;
+    lv_color_t co2_border_color = LV_COLOR_GREEN;
+    lv_color_t pm2_5_border_color = LV_COLOR_GRAY;
+    lv_color_t pm10_border_color = LV_COLOR_GRAY;
 
     int8_t bar_x_offset = -10;
     int8_t bar_y_offset = 8;
-    int8_t row2_y_offset = 110;
-    int8_t row1_y_offset = 40;
+    int8_t row2_y_offset = 110 + 5;
+    int8_t row1_y_offset = 40 + 5;
 
     /* logo */
     // lv_obj_t *logo_box = lv_obj_create(lv_scr_act(), NULL);
@@ -183,50 +188,153 @@ void st7899_display_application()
     // lv_obj_t *logo_icon = lv_img_create(logo_box, NULL);
     // lv_img_set_src(logo_icon, &logo_img_src);
     // lv_obj_align(logo_icon, logo_box, LV_ALIGN_CENTER, 0, -3);
+
     /* indicator */
-    lv_obj_t *overall_indicator_bar = lv_bar_create(lv_scr_act(), NULL);
-    lv_obj_set_size(overall_indicator_bar, 230, 30);
-    lv_obj_align(overall_indicator_bar, lv_scr_act(), LV_ALIGN_IN_TOP_MID, 0, 0);
-    lv_bar_set_value(overall_indicator_bar, 100, LV_ANIM_OFF);
-    lv_style_init(&overall_indicator_bar_style);  
-    lv_style_set_bg_color(&overall_indicator_bar_style, LV_STATE_DEFAULT, LV_COLOR_RED);
-    lv_obj_add_style(overall_indicator_bar, LV_BAR_PART_INDIC, &overall_indicator_bar_style);
+    // lv_obj_t *overall_indicator_bar = lv_bar_create(lv_scr_act(), NULL);
+    // lv_obj_set_size(overall_indicator_bar, 230, 30);
+    // lv_obj_align(overall_indicator_bar, lv_scr_act(), LV_ALIGN_IN_TOP_MID, 0, 0);
+    // lv_bar_set_value(overall_indicator_bar, 100, LV_ANIM_OFF);
+    // lv_style_init(&overall_indicator_bar_style);
+    // lv_style_set_bg_color(&overall_indicator_bar_style, LV_STATE_DEFAULT, LV_COLOR_GREEN);
+    // lv_obj_add_style(overall_indicator_bar, LV_BAR_PART_INDIC, &overall_indicator_bar_style);
 
-    lv_obj_t *overall_indicator_value = lv_label_create(overall_indicator_bar, NULL);
-    lv_obj_align(overall_indicator_value, overall_indicator_bar, LV_ALIGN_IN_TOP_LEFT, 32, 0);
-    lv_label_set_text(overall_indicator_value, "UNHEALTHY");
-    static lv_style_t overall_indicator_value_style;
-    lv_style_init(&overall_indicator_value_style);
-    lv_style_set_text_color(&overall_indicator_value_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-    lv_style_set_text_font(&overall_indicator_value_style, LV_STATE_DEFAULT, &lv_font_montserrat_24);
-    lv_obj_add_style(overall_indicator_value, LV_OBJ_PART_MAIN, &overall_indicator_value_style);
+    // lv_obj_t *overall_indicator_value = lv_label_create(overall_indicator_bar, NULL);
+    // lv_obj_align(overall_indicator_value, overall_indicator_bar, LV_ALIGN_IN_TOP_LEFT, 70, 0);
+    // lv_label_set_text(overall_indicator_value, "GOOD");
+    // static lv_style_t overall_indicator_value_style;
+    // lv_style_init(&overall_indicator_value_style);
+    // lv_style_set_text_color(&overall_indicator_value_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    // lv_style_set_text_font(&overall_indicator_value_style, LV_STATE_DEFAULT, &lv_font_montserrat_24);
+    // lv_obj_add_style(overall_indicator_value, LV_OBJ_PART_MAIN, &overall_indicator_value_style);
 
+    lv_obj_t *overall_indicator_box = lv_obj_create(lv_scr_act(), NULL);
+    lv_obj_set_size(overall_indicator_box, 240, 230 / 6);
+    lv_obj_align(overall_indicator_box, lv_scr_act(), LV_ALIGN_IN_TOP_MID, 0, 0);
+    static lv_style_t overall_indicator_box_style;
+    lv_style_init(&overall_indicator_box_style);
+    lv_style_set_bg_color(&overall_indicator_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    lv_style_set_border_color(&overall_indicator_box_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_obj_add_style(overall_indicator_box, LV_OBJ_PART_MAIN, &overall_indicator_box_style);
+
+    lv_obj_t *overall_indicator_title = lv_label_create(overall_indicator_box, NULL);
+    lv_obj_align(overall_indicator_title, overall_indicator_box, LV_ALIGN_IN_LEFT_MID, 2, 0);
+    lv_label_set_text(overall_indicator_title, "AQI");
+    static lv_style_t overall_indicator_title_style;
+    lv_style_init(&overall_indicator_title_style);
+    lv_style_set_text_color(&overall_indicator_title_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    lv_style_set_text_font(&overall_indicator_title_style, LV_STATE_DEFAULT, &lv_font_montserrat_20);
+    lv_obj_add_style(overall_indicator_title, LV_OBJ_PART_MAIN, &overall_indicator_title_style);
+
+    lv_obj_t *overall_indicator_pointer = lv_label_create(overall_indicator_box, NULL);
+    lv_label_set_text(overall_indicator_pointer, LV_SYMBOL_EJECT);
+    lv_obj_align(overall_indicator_pointer, overall_indicator_box, LV_ALIGN_IN_BOTTOM_LEFT, 55, 8);
+    static lv_style_t overall_indicator_pointer_style;
+    lv_style_set_text_color(&overall_indicator_pointer_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+    lv_style_set_text_font(&overall_indicator_pointer_style, LV_STATE_DEFAULT, &lv_font_montserrat_14);
+    lv_obj_add_style(overall_indicator_pointer, LV_OBJ_PART_MAIN, &overall_indicator_pointer_style);
+
+    int8_t overall_indicator_color_box_y_offset = 5;
+    int8_t overall_indicator_color_box_x_offset = 5;
+
+    lv_obj_t *overall_indicator_green_box = lv_obj_create(overall_indicator_box, NULL);
+    lv_obj_set_size(overall_indicator_green_box, 230 / 8, (230 / 12) - 2);
+    lv_obj_align(overall_indicator_green_box, overall_indicator_box, LV_ALIGN_IN_TOP_LEFT, (235 / 8) * 2, overall_indicator_color_box_y_offset);
+    // lv_obj_set_width_margin(overall_indicator_green_box, 0);
+    static lv_style_t overall_indicator_green_box_style;
+    lv_style_init(&overall_indicator_green_box_style);
+    lv_style_set_radius(&overall_indicator_green_box_style, LV_STATE_DEFAULT, 0);
+    lv_style_set_bg_color(&overall_indicator_green_box_style, LV_STATE_DEFAULT, LV_COLOR_GOOD);
+    lv_style_set_border_color(&overall_indicator_green_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    lv_obj_add_style(overall_indicator_green_box, LV_OBJ_PART_MAIN, &overall_indicator_green_box_style);
+
+    lv_obj_t *overall_indicator_yellow_box = lv_obj_create(overall_indicator_box, NULL);
+    lv_obj_set_size(overall_indicator_yellow_box, 230 / 8, (230 / 12) - 2);
+    lv_obj_align(overall_indicator_yellow_box, overall_indicator_box, LV_ALIGN_IN_TOP_LEFT, (235 / 8) * 3, overall_indicator_color_box_y_offset);
+    // lv_obj_set_width_margin(overall_indicator_green_box, 0);
+    static lv_style_t overall_indicator_yellow_box_style;
+    lv_style_init(&overall_indicator_yellow_box_style);
+    lv_style_set_radius(&overall_indicator_yellow_box_style, LV_STATE_DEFAULT, 0);
+    lv_style_set_bg_color(&overall_indicator_yellow_box_style, LV_STATE_DEFAULT, LV_COLOR_GOOD);
+    lv_style_set_border_color(&overall_indicator_yellow_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    lv_obj_add_style(overall_indicator_yellow_box, LV_OBJ_PART_MAIN, &overall_indicator_yellow_box_style);
+
+    lv_obj_t *overall_indicator_orange_box = lv_obj_create(overall_indicator_box, NULL);
+    lv_obj_set_size(overall_indicator_orange_box, 230 / 8, (230 / 12) - 2);
+    lv_obj_align(overall_indicator_orange_box, overall_indicator_box, LV_ALIGN_IN_TOP_LEFT, (235 / 8) * 4, overall_indicator_color_box_y_offset);
+    static lv_style_t overall_indicator_orange_box_style;
+    lv_style_init(&overall_indicator_orange_box_style);
+    lv_style_set_radius(&overall_indicator_orange_box_style, LV_STATE_DEFAULT, 0);
+    lv_style_set_bg_color(&overall_indicator_orange_box_style, LV_STATE_DEFAULT, LV_COLOR_MODERATE);
+    lv_style_set_border_color(&overall_indicator_orange_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    lv_obj_add_style(overall_indicator_orange_box, LV_OBJ_PART_MAIN, &overall_indicator_orange_box_style);
+
+    lv_obj_t *overall_indicator_maroon_box = lv_obj_create(overall_indicator_box, NULL);
+    lv_obj_set_size(overall_indicator_maroon_box, 230 / 8, (230 / 12) - 2);
+    lv_obj_align(overall_indicator_maroon_box, overall_indicator_box, LV_ALIGN_IN_TOP_LEFT, (235 / 8) * 5, overall_indicator_color_box_y_offset);
+    static lv_style_t overall_indicator_maroon_box_style;
+    lv_style_init(&overall_indicator_maroon_box_style);
+    lv_style_set_radius(&overall_indicator_maroon_box_style, LV_STATE_DEFAULT, 0);
+    lv_style_set_bg_color(&overall_indicator_maroon_box_style, LV_STATE_DEFAULT, LV_COLOR_MODERATE);
+    lv_style_set_border_color(&overall_indicator_maroon_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    lv_obj_add_style(overall_indicator_maroon_box, LV_OBJ_PART_MAIN, &overall_indicator_maroon_box_style);
+
+    lv_obj_t *overall_indicator_pink_box = lv_obj_create(overall_indicator_box, NULL);
+    lv_obj_set_size(overall_indicator_pink_box, 230 / 8, (230 / 12) - 2);
+    lv_obj_align(overall_indicator_pink_box, overall_indicator_box, LV_ALIGN_IN_TOP_LEFT, (235 / 8) * 6, overall_indicator_color_box_y_offset);
+    static lv_style_t overall_indicator_pink_box_style;
+    lv_style_init(&overall_indicator_pink_box_style);
+    lv_style_set_radius(&overall_indicator_pink_box_style, LV_STATE_DEFAULT, 0);
+    lv_style_set_bg_color(&overall_indicator_pink_box_style, LV_STATE_DEFAULT, LV_COLOR_UNHEALTHY);
+    lv_style_set_border_color(&overall_indicator_pink_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    lv_obj_add_style(overall_indicator_pink_box, LV_OBJ_PART_MAIN, &overall_indicator_pink_box_style);
+
+    lv_obj_t *overall_indicator_red_box = lv_obj_create(overall_indicator_box, NULL);
+    lv_obj_set_size(overall_indicator_red_box, 230 / 8, (230 / 12) - 2);
+    lv_obj_align(overall_indicator_red_box, overall_indicator_box, LV_ALIGN_IN_TOP_LEFT, (235 / 8) * 7, overall_indicator_color_box_y_offset);
+    static lv_style_t overall_indicator_red_box_style;
+    lv_style_init(&overall_indicator_red_box_style);
+    lv_style_set_radius(&overall_indicator_red_box_style, LV_STATE_DEFAULT, 0);
+    lv_style_set_bg_color(&overall_indicator_red_box_style, LV_STATE_DEFAULT, LV_COLOR_UNHEALTHY);
+    lv_style_set_border_color(&overall_indicator_red_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    lv_obj_add_style(overall_indicator_red_box, LV_OBJ_PART_MAIN, &overall_indicator_red_box_style);
+
+    /*
+    lv_obj_t *overall_indicator_green_box = lv_obj_create(overall_indicator_box, NULL);
+    lv_obj_set_size(overall_indicator_green_box, 230 / 8, (230 / 9) - 2);
+    lv_obj_align(overall_indicator_green_box, overall_indicator_box, LV_ALIGN_IN_LEFT_MID, 0, 0);
+    static lv_style_t overall_indicator_green_box_style;
+    lv_style_init(&overall_indicator_green_box_style);
+    lv_style_set_bg_color(&overall_indicator_green_box_style, LV_STATE_DEFAULT, LV_COLOR_GREEN);
+    lv_style_set_border_color(&overall_indicator_green_box_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_obj_add_style(overall_indicator_green_box, LV_OBJ_PART_MAIN, &overall_indicator_green_box_style);
+*/
     /* voc */
     lv_obj_t *voc_box = lv_obj_create(lv_scr_act(), NULL);
-    lv_obj_set_size(voc_box, 230/2, 230/4);
+    lv_obj_set_size(voc_box, 230 / 2, 230 / 4);
     lv_obj_align(voc_box, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, row1_y_offset);
     static lv_style_t voc_box_style;
     lv_style_init(&voc_box_style);
     lv_style_set_bg_color(&voc_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    lv_style_set_border_color(&voc_box_style, LV_STATE_DEFAULT, box_border_color);
+    lv_style_set_border_color(&voc_box_style, LV_STATE_DEFAULT, voc_border_color);
     lv_obj_add_style(voc_box, LV_OBJ_PART_MAIN, &voc_box_style);
 
-    lv_obj_t *voc_icon = lv_img_create(voc_box, NULL);
-    lv_img_set_src(voc_icon, &voc_img_src);
-    lv_obj_align(voc_icon, voc_box, LV_ALIGN_IN_TOP_LEFT, 3, 3);
+    // lv_obj_t *voc_icon = lv_img_create(voc_box, NULL);
+    // lv_img_set_src(voc_icon, &voc_img_src);
+    // lv_obj_align(voc_icon, voc_box, LV_ALIGN_IN_TOP_LEFT, 3, 3);
 
     lv_obj_t *voc_value = lv_label_create(voc_box, NULL);
-    lv_label_set_text(voc_value, "500");
-    lv_obj_align(voc_value, voc_box, LV_ALIGN_IN_TOP_LEFT, 30, 0);
-    static lv_style_t voc_value_style;
+    lv_label_set_text(voc_value, "42");
+    // lv_obj_align(voc_value, voc_box, LV_ALIGN_IN_TOP_LEFT, 33, 0);
+    lv_obj_align(voc_value, voc_box, LV_ALIGN_IN_TOP_LEFT, 3, 0);
+    // static lv_style_t voc_value_style;
     lv_style_init(&voc_value_style);
     lv_style_set_text_font(&voc_value_style, LV_STATE_DEFAULT, &lv_font_montserrat_28);
     lv_style_set_text_color(&voc_value_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_obj_add_style(voc_value, LV_OBJ_PART_MAIN, &voc_value_style);
 
     lv_obj_t *voc_bar = lv_bar_create(voc_box, NULL);
-    lv_obj_set_size(voc_bar, 15, 15);
-    lv_obj_align(voc_bar, voc_box, LV_ALIGN_IN_TOP_RIGHT, bar_x_offset, bar_y_offset);
+    lv_obj_set_size(voc_bar, (6), (230 / 4) - 10);
+    lv_obj_align(voc_bar, voc_box, LV_ALIGN_IN_RIGHT_MID, -5, 0);
     lv_bar_set_value(voc_bar, 100, LV_ANIM_OFF);
     lv_style_init(&voc_bar_style);
     lv_style_set_bg_color(&voc_bar_style, LV_STATE_DEFAULT, LV_COLOR_GREEN);
@@ -243,29 +351,30 @@ void st7899_display_application()
 
     /* co2 */
     lv_obj_t *co2_box = lv_obj_create(lv_scr_act(), NULL);
-    lv_obj_set_size(co2_box, 230/2, 230/4);
-    lv_obj_align(co2_box, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, (230/2)+10, row1_y_offset);
+    lv_obj_set_size(co2_box, 230 / 2, 230 / 4);
+    lv_obj_align(co2_box, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, (230 / 2) + 10, row1_y_offset);
     static lv_style_t co2_box_style;
     lv_style_init(&co2_box_style);
     lv_style_set_bg_color(&co2_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    lv_style_set_border_color(&co2_box_style, LV_STATE_DEFAULT, box_border_color);
+    lv_style_set_border_color(&co2_box_style, LV_STATE_DEFAULT, co2_border_color);
     lv_obj_add_style(co2_box, LV_OBJ_PART_MAIN, &co2_box_style);
 
-    lv_obj_t *co2_icon = lv_img_create(co2_box, NULL);
-    lv_img_set_src(co2_icon, &voc_img_src);
-    lv_obj_align(co2_icon, co2_box, LV_ALIGN_IN_TOP_LEFT, 3, 6);
+    // lv_obj_t *co2_icon = lv_img_create(co2_box, NULL);
+    // lv_img_set_src(co2_icon, &voc_img_src);
+    // lv_obj_align(co2_icon, co2_box, LV_ALIGN_IN_TOP_LEFT, 3, 6);
 
     lv_obj_t *co2_value = lv_label_create(co2_box, NULL);
-    lv_label_set_text(co2_value, "333");
-    lv_obj_align(co2_value, co2_box, LV_ALIGN_IN_TOP_LEFT, 30, 0);
+    lv_label_set_text(co2_value, "317");
+    // lv_obj_align(co2_value, co2_box, LV_ALIGN_IN_TOP_LEFT, 30, 0);
+    lv_obj_align(co2_value, co2_box, LV_ALIGN_IN_TOP_LEFT, 3, 0);
     lv_style_init(&co2_value_style);
     lv_style_set_text_font(&co2_value_style, LV_STATE_DEFAULT, &lv_font_montserrat_28);
     lv_style_set_text_color(&co2_value_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_obj_add_style(co2_value, LV_OBJ_PART_MAIN, &co2_value_style);
 
     lv_obj_t *co2_bar = lv_bar_create(co2_box, NULL);
-    lv_obj_set_size(co2_bar, 15, 15);
-    lv_obj_align(co2_bar, co2_box, LV_ALIGN_IN_TOP_RIGHT, bar_x_offset, bar_y_offset);
+    lv_obj_set_size(co2_bar, (6), (230 / 4) - 10);
+    lv_obj_align(co2_bar, co2_box, LV_ALIGN_IN_RIGHT_MID, -5, 0);
     lv_bar_set_value(co2_bar, 100, LV_ANIM_OFF);
     lv_style_init(&co2_bar_style);
     lv_style_set_bg_color(&co2_bar_style, LV_STATE_DEFAULT, LV_COLOR_GREEN);
@@ -276,27 +385,28 @@ void st7899_display_application()
     lv_obj_align(co2_label, co2_box, LV_ALIGN_IN_BOTTOM_LEFT, 3, 0);
     static lv_style_t co2_label_style;
     lv_style_init(&co2_label_style);
-    lv_style_set_text_font(&co2_label_style, LV_STATE_DEFAULT, &lv_font_montserrat_18);
+    lv_style_set_text_font(&co2_label_style, LV_STATE_DEFAULT, &lv_font_montserrat_16);
     lv_style_set_text_color(&co2_label_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_obj_add_style(co2_label, LV_OBJ_PART_MAIN, &co2_label_style);
 
     /* temp */
     lv_obj_t *temp_box = lv_obj_create(lv_scr_act(), NULL);
-    lv_obj_set_size(temp_box, 230/2, 230/4);
+    lv_obj_set_size(temp_box, 230 / 2, 230 / 4);
     lv_obj_align(temp_box, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, row2_y_offset);
     static lv_style_t temp_box_style;
     lv_style_init(&temp_box_style);
     lv_style_set_bg_color(&temp_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    lv_style_set_border_color(&temp_box_style, LV_STATE_DEFAULT, box_border_color);
+    lv_style_set_border_color(&temp_box_style, LV_STATE_DEFAULT, temp_border_color);
     lv_obj_add_style(temp_box, LV_OBJ_PART_MAIN, &temp_box_style);
 
-    lv_obj_t *temp_icon = lv_img_create(temp_box, NULL);
-    lv_img_set_src(temp_icon, &temp_img_src);
-    lv_obj_align(temp_icon, temp_box, LV_ALIGN_IN_TOP_LEFT, 3, 3);
+    // lv_obj_t *temp_icon = lv_img_create(temp_box, NULL);
+    // lv_img_set_src(temp_icon, &temp_img_src);
+    // lv_obj_align(temp_icon, temp_box, LV_ALIGN_IN_TOP_LEFT, 3, 3);
 
     lv_obj_t *temp_value = lv_label_create(temp_box, NULL);
     lv_label_set_text(temp_value, "25.4C");
-    lv_obj_align(temp_value, temp_box, LV_ALIGN_IN_TOP_LEFT, 30, 0);
+    // lv_obj_align(temp_value, temp_box, LV_ALIGN_IN_TOP_LEFT, 30, 0);
+    lv_obj_align(temp_value, temp_box, LV_ALIGN_IN_TOP_LEFT, 3, 0);
     static lv_style_t temp_value_style;
     lv_style_init(&temp_value_style);
     lv_style_set_text_font(&temp_value_style, LV_STATE_DEFAULT, &lv_font_montserrat_26);
@@ -314,21 +424,22 @@ void st7899_display_application()
 
     /* hum */
     lv_obj_t *hum_box = lv_obj_create(lv_scr_act(), NULL);
-    lv_obj_set_size(hum_box, 230/2, 230/4);
-    lv_obj_align(hum_box, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, (230/2)+10, row2_y_offset);
+    lv_obj_set_size(hum_box, 230 / 2, 230 / 4);
+    lv_obj_align(hum_box, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, (230 / 2) + 10, row2_y_offset);
     static lv_style_t hum_box_style;
     lv_style_init(&hum_box_style);
     lv_style_set_bg_color(&hum_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    lv_style_set_border_color(&hum_box_style, LV_STATE_DEFAULT, box_border_color);
+    lv_style_set_border_color(&hum_box_style, LV_STATE_DEFAULT, hum_border_color);
     lv_obj_add_style(hum_box, LV_OBJ_PART_MAIN, &hum_box_style);
 
-    lv_obj_t *hum_icon = lv_img_create(hum_box, NULL);
-    lv_img_set_src(hum_icon, &hum_img_src);
-    lv_obj_align(hum_icon, hum_box, LV_ALIGN_IN_TOP_LEFT, 3, 3);
+    // lv_obj_t *hum_icon = lv_img_create(hum_box, NULL);
+    // lv_img_set_src(hum_icon, &hum_img_src);
+    // lv_obj_align(hum_icon, hum_box, LV_ALIGN_IN_TOP_LEFT, 3, 3);
 
     lv_obj_t *hum_value = lv_label_create(hum_box, NULL);
-    lv_label_set_text(hum_value, "57%");
-    lv_obj_align(hum_value, hum_box, LV_ALIGN_IN_TOP_LEFT, 40, 0);
+    lv_label_set_text(hum_value, "47%");
+    // lv_obj_align(hum_value, hum_box, LV_ALIGN_IN_TOP_LEFT, 35, 0);
+    lv_obj_align(hum_value, hum_box, LV_ALIGN_IN_TOP_LEFT, 3, 0);
     static lv_style_t hum_value_style;
     lv_style_init(&hum_value_style);
     lv_style_set_text_font(&hum_value_style, LV_STATE_DEFAULT, &lv_font_montserrat_26);
@@ -344,23 +455,33 @@ void st7899_display_application()
     lv_style_set_text_color(&hum_label_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_obj_add_style(hum_label, LV_OBJ_PART_MAIN, &hum_label_style);
 
+    lv_obj_t *hum_bar = lv_bar_create(hum_box, NULL);
+    lv_obj_set_size(hum_bar, (6), (230 / 4) - 10);
+    lv_obj_align(hum_bar, hum_box, LV_ALIGN_IN_RIGHT_MID, -5, 0);
+    lv_bar_set_value(hum_bar, 100, LV_ANIM_OFF);
+    lv_style_init(&hum_bar_style);
+    lv_style_set_bg_color(&hum_bar_style, LV_STATE_DEFAULT, LV_COLOR_GREEN);
+    lv_obj_add_style(hum_bar, LV_BAR_PART_INDIC, &hum_bar_style);
+
     /* pm2.5 */
     lv_obj_t *pm2_5_box = lv_obj_create(lv_scr_act(), NULL);
-    lv_obj_set_size(pm2_5_box, 230/2, 230/4);
-    lv_obj_align(pm2_5_box, lv_scr_act(), LV_ALIGN_IN_BOTTOM_LEFT, 0, -5);
+    lv_obj_set_size(pm2_5_box, 230 / 2, 230 / 4);
+    lv_obj_align(pm2_5_box, lv_scr_act(), LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
     static lv_style_t pm2_5_box_style;
     lv_style_init(&pm2_5_box_style);
     lv_style_set_bg_color(&pm2_5_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    lv_style_set_border_color(&pm2_5_box_style, LV_STATE_DEFAULT, box_border_color);
+    lv_style_set_border_color(&pm2_5_box_style, LV_STATE_DEFAULT, pm2_5_border_color);
     lv_obj_add_style(pm2_5_box, LV_OBJ_PART_MAIN, &pm2_5_box_style);
 
-    lv_obj_t *pm2_5_icon = lv_img_create(pm2_5_box, NULL);
-    lv_img_set_src(pm2_5_icon, &dust_img_src);
-    lv_obj_align(pm2_5_icon, pm2_5_box, LV_ALIGN_IN_TOP_LEFT, 3, 6);
-
+// lv_obj_t *pm2_5_icon = lv_img_create(pm2_5_box, NULL);
+// lv_img_set_src(pm2_5_icon, &dust_img_src);
+// lv_obj_align(pm2_5_icon, pm2_5_box, LV_ALIGN_IN_TOP_LEFT, 3, 6);
+#define PM_SENSORS_INSTALLED
+#ifdef PM_SENSORS_INSTALLED
     lv_obj_t *pm2_5_value = lv_label_create(pm2_5_box, NULL);
     lv_label_set_text(pm2_5_value, "na");
-    lv_obj_align(pm2_5_value, pm2_5_box, LV_ALIGN_IN_TOP_LEFT, 30, 0);
+    lv_obj_align(pm2_5_value, pm2_5_box, LV_ALIGN_IN_TOP_LEFT, 3, 0);
+    // lv_obj_align(pm2_5_value, pm2_5_box, LV_ALIGN_IN_TOP_LEFT, 30, 0);
     static lv_style_t pm2_5_value_style;
     lv_style_init(&pm2_5_value_style);
     lv_style_set_text_font(&pm2_5_value_style, LV_STATE_DEFAULT, &lv_font_montserrat_28);
@@ -368,15 +489,15 @@ void st7899_display_application()
     lv_obj_add_style(pm2_5_value, LV_OBJ_PART_MAIN, &pm2_5_value_style);
 
     lv_obj_t *pm2_5_bar = lv_bar_create(pm2_5_box, NULL);
-    lv_obj_set_size(pm2_5_bar, 15, 15);
-    lv_obj_align(pm2_5_bar, pm2_5_box, LV_ALIGN_IN_TOP_RIGHT, bar_x_offset, bar_y_offset);
+    lv_obj_set_size(pm2_5_bar, (6), (230 / 4) - 10);
+    lv_obj_align(pm2_5_bar, pm2_5_box, LV_ALIGN_IN_RIGHT_MID, -5, 0);
     lv_bar_set_value(pm2_5_bar, 100, LV_ANIM_OFF);
     lv_style_init(&pm2_5_bar_style);
     lv_style_set_bg_color(&pm2_5_bar_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
     lv_obj_add_style(pm2_5_bar, LV_BAR_PART_INDIC, &pm2_5_bar_style);
 
     lv_obj_t *pm2_5_label = lv_label_create(pm2_5_box, NULL);
-    lv_label_set_text(pm2_5_label, "PM2.5 (ug/m3)");
+    lv_label_set_text(pm2_5_label, "PM2.5 (ug/m³)");
     lv_obj_align(pm2_5_label, pm2_5_box, LV_ALIGN_IN_BOTTOM_LEFT, 3, 0);
     static lv_style_t pm2_5_label_style;
     lv_style_init(&pm2_5_label_style);
@@ -384,24 +505,33 @@ void st7899_display_application()
     lv_style_set_text_color(&pm2_5_label_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
     lv_obj_add_style(pm2_5_label, LV_OBJ_PART_MAIN, &pm2_5_label_style);
 
+    lv_obj_t *pm2_5_unit = lv_label_create(pm2_5_box, NULL);
+    lv_label_set_text(pm2_5_unit, "");
+    lv_obj_align(pm2_5_unit, pm2_5_box, LV_ALIGN_IN_BOTTOM_LEFT, 53, 0);
+    static lv_style_t pm2_5_unit_style;
+    lv_style_init(&pm2_5_unit_style);
+    lv_style_set_text_font(&pm2_5_unit_style, LV_STATE_DEFAULT, &lv_font_montserrat_12);
+    lv_style_set_text_color(&pm2_5_unit_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_obj_add_style(pm2_5_unit, LV_OBJ_PART_MAIN, &pm2_5_unit_style);
 
     /* pm10 */
     lv_obj_t *pm10_box = lv_obj_create(lv_scr_act(), NULL);
-    lv_obj_set_size(pm10_box, 230/2, 230/4);
-    lv_obj_align(pm10_box, lv_scr_act(), LV_ALIGN_IN_BOTTOM_LEFT, (230/2)+10, -5);
+    lv_obj_set_size(pm10_box, 230 / 2, 230 / 4);
+    lv_obj_align(pm10_box, lv_scr_act(), LV_ALIGN_IN_BOTTOM_LEFT, (230 / 2) + 10, 0);
     static lv_style_t pm10_box_style;
     lv_style_init(&pm10_box_style);
     lv_style_set_bg_color(&pm10_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    lv_style_set_border_color(&pm10_box_style, LV_STATE_DEFAULT, box_border_color);
+    lv_style_set_border_color(&pm10_box_style, LV_STATE_DEFAULT, pm10_border_color);
     lv_obj_add_style(pm10_box, LV_OBJ_PART_MAIN, &pm10_box_style);
 
-    lv_obj_t *pm10_icon = lv_img_create(pm10_box, NULL);
-    lv_img_set_src(pm10_icon, &dust_img_src);
-    lv_obj_align(pm10_icon, pm10_box, LV_ALIGN_IN_TOP_LEFT, 3, 6);
+    // lv_obj_t *pm10_icon = lv_img_create(pm10_box, NULL);
+    // lv_img_set_src(pm10_icon, &dust_img_src);
+    // lv_obj_align(pm10_icon, pm10_box, LV_ALIGN_IN_TOP_LEFT, 3, 6);
 
     lv_obj_t *pm10_value = lv_label_create(pm10_box, NULL);
     lv_label_set_text(pm10_value, "na");
-    lv_obj_align(pm10_value, pm10_box, LV_ALIGN_IN_TOP_LEFT, 30, 0);
+    // lv_obj_align(pm10_value, pm10_box, LV_ALIGN_IN_TOP_LEFT, 30, 0);
+    lv_obj_align(pm10_value, pm10_box, LV_ALIGN_IN_TOP_LEFT, 3, 0);
     static lv_style_t pm10_value_style;
     lv_style_init(&pm10_value_style);
     lv_style_set_text_font(&pm10_value_style, LV_STATE_DEFAULT, &lv_font_montserrat_28);
@@ -409,8 +539,8 @@ void st7899_display_application()
     lv_obj_add_style(pm10_value, LV_OBJ_PART_MAIN, &pm10_value_style);
 
     lv_obj_t *pm10_bar = lv_bar_create(pm10_box, NULL);
-    lv_obj_set_size(pm10_bar, 15, 15);
-    lv_obj_align(pm10_bar, pm10_box, LV_ALIGN_IN_TOP_RIGHT, bar_x_offset, bar_y_offset);
+    lv_obj_set_size(pm10_bar, (6), (230 / 4) - 10);
+    lv_obj_align(pm10_bar, pm10_box, LV_ALIGN_IN_RIGHT_MID, -5, 0);
     lv_bar_set_value(pm10_bar, 100, LV_ANIM_OFF);
     lv_style_init(&pm10_bar_style);
     lv_style_set_bg_color(&pm10_bar_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
@@ -424,22 +554,116 @@ void st7899_display_application()
     lv_style_set_text_font(&pm10_label_style, LV_STATE_DEFAULT, &lv_font_montserrat_14);
     lv_style_set_text_color(&pm10_label_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
     lv_obj_add_style(pm10_label, LV_OBJ_PART_MAIN, &pm10_label_style);
+
+    lv_obj_t *pm10_unit = lv_label_create(pm10_box, NULL);
+    lv_label_set_text(pm10_unit, "");
+    lv_obj_align(pm10_unit, pm10_box, LV_ALIGN_IN_BOTTOM_LEFT, 50, 0);
+    static lv_style_t pm10_unit_style;
+    lv_style_init(&pm10_unit_style);
+    lv_style_set_text_font(&pm10_unit_style, LV_STATE_DEFAULT, &lv_font_montserrat_12);
+    lv_style_set_text_color(&pm10_unit_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_obj_add_style(pm10_unit, LV_OBJ_PART_MAIN, &pm10_unit_style);
+#else
+    lv_obj_t *pm2_5_value = lv_label_create(pm2_5_box, NULL);
+    lv_label_set_text(pm2_5_value, "na");
+    lv_obj_align(pm2_5_value, pm2_5_box, LV_ALIGN_IN_TOP_LEFT, 3, 0);
+    // lv_obj_align(pm2_5_value, pm2_5_box, LV_ALIGN_IN_TOP_LEFT, 30, 0);
+    static lv_style_t pm2_5_value_style;
+    lv_style_init(&pm2_5_value_style);
+    lv_style_set_text_font(&pm2_5_value_style, LV_STATE_DEFAULT, &lv_font_montserrat_28);
+    lv_style_set_text_color(&pm2_5_value_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_obj_add_style(pm2_5_value, LV_OBJ_PART_MAIN, &pm2_5_value_style);
+
+    lv_obj_t *pm2_5_bar = lv_bar_create(pm2_5_box, NULL);
+    lv_obj_set_size(pm2_5_bar, (6), (230 / 4) - 10);
+    lv_obj_align(pm2_5_bar, pm2_5_box, LV_ALIGN_IN_RIGHT_MID, -5, 0);
+    lv_bar_set_value(pm2_5_bar, 100, LV_ANIM_OFF);
+    lv_style_init(&pm2_5_bar_style);
+    lv_style_set_bg_color(&pm2_5_bar_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_obj_add_style(pm2_5_bar, LV_BAR_PART_INDIC, &pm2_5_bar_style);
+
+    lv_obj_t *pm2_5_label = lv_label_create(pm2_5_box, NULL);
+    lv_label_set_text(pm2_5_label, "PM2.5 (ug/m³)");
+    lv_obj_align(pm2_5_label, pm2_5_box, LV_ALIGN_IN_BOTTOM_LEFT, 3, 0);
+    static lv_style_t pm2_5_label_style;
+    lv_style_init(&pm2_5_label_style);
+    lv_style_set_text_font(&pm2_5_label_style, LV_STATE_DEFAULT, &lv_font_montserrat_14);
+    lv_style_set_text_color(&pm2_5_label_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_obj_add_style(pm2_5_label, LV_OBJ_PART_MAIN, &pm2_5_label_style);
+
+    lv_obj_t *pm2_5_unit = lv_label_create(pm2_5_box, NULL);
+    lv_label_set_text(pm2_5_unit, "");
+    lv_obj_align(pm2_5_unit, pm2_5_box, LV_ALIGN_IN_BOTTOM_LEFT, 53, 0);
+    static lv_style_t pm2_5_unit_style;
+    lv_style_init(&pm2_5_unit_style);
+    lv_style_set_text_font(&pm2_5_unit_style, LV_STATE_DEFAULT, &lv_font_montserrat_12);
+    lv_style_set_text_color(&pm2_5_unit_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_obj_add_style(pm2_5_unit, LV_OBJ_PART_MAIN, &pm2_5_unit_style);
+
+    /* pm10 */
+    lv_obj_t *pm10_box = lv_obj_create(lv_scr_act(), NULL);
+    lv_obj_set_size(pm10_box, 230 / 2, 230 / 4);
+    lv_obj_align(pm10_box, lv_scr_act(), LV_ALIGN_IN_BOTTOM_LEFT, (230 / 2) + 10, 0);
+    static lv_style_t pm10_box_style;
+    lv_style_init(&pm10_box_style);
+    lv_style_set_bg_color(&pm10_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+    lv_style_set_border_color(&pm10_box_style, LV_STATE_DEFAULT, pm10_border_color);
+    lv_obj_add_style(pm10_box, LV_OBJ_PART_MAIN, &pm10_box_style);
+
+    // lv_obj_t *pm10_icon = lv_img_create(pm10_box, NULL);
+    // lv_img_set_src(pm10_icon, &dust_img_src);
+    // lv_obj_align(pm10_icon, pm10_box, LV_ALIGN_IN_TOP_LEFT, 3, 6);
+
+    lv_obj_t *pm10_value = lv_label_create(pm10_box, NULL);
+    lv_label_set_text(pm10_value, "na");
+    // lv_obj_align(pm10_value, pm10_box, LV_ALIGN_IN_TOP_LEFT, 30, 0);
+    lv_obj_align(pm10_value, pm10_box, LV_ALIGN_IN_TOP_LEFT, 3, 0);
+    static lv_style_t pm10_value_style;
+    lv_style_init(&pm10_value_style);
+    lv_style_set_text_font(&pm10_value_style, LV_STATE_DEFAULT, &lv_font_montserrat_28);
+    lv_style_set_text_color(&pm10_value_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_obj_add_style(pm10_value, LV_OBJ_PART_MAIN, &pm10_value_style);
+
+    lv_obj_t *pm10_bar = lv_bar_create(pm10_box, NULL);
+    lv_obj_set_size(pm10_bar, (6), (230 / 4) - 10);
+    lv_obj_align(pm10_bar, pm10_box, LV_ALIGN_IN_RIGHT_MID, -5, 0);
+    lv_bar_set_value(pm10_bar, 100, LV_ANIM_OFF);
+    lv_style_init(&pm10_bar_style);
+    lv_style_set_bg_color(&pm10_bar_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_obj_add_style(pm10_bar, LV_BAR_PART_INDIC, &pm10_bar_style);
+
+    lv_obj_t *pm10_label = lv_label_create(pm10_box, NULL);
+    lv_label_set_text(pm10_label, "PM10 (ug/m3)");
+    lv_obj_align(pm10_label, pm10_box, LV_ALIGN_IN_BOTTOM_LEFT, 3, 0);
+    static lv_style_t pm10_label_style;
+    lv_style_init(&pm10_label_style);
+    lv_style_set_text_font(&pm10_label_style, LV_STATE_DEFAULT, &lv_font_montserrat_14);
+    lv_style_set_text_color(&pm10_label_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_obj_add_style(pm10_label, LV_OBJ_PART_MAIN, &pm10_label_style);
+
+    lv_obj_t *pm10_unit = lv_label_create(pm10_box, NULL);
+    lv_label_set_text(pm10_unit, "");
+    lv_obj_align(pm10_unit, pm10_box, LV_ALIGN_IN_BOTTOM_LEFT, 50, 0);
+    static lv_style_t pm10_unit_style;
+    lv_style_init(&pm10_unit_style);
+    lv_style_set_text_font(&pm10_unit_style, LV_STATE_DEFAULT, &lv_font_montserrat_12);
+    lv_style_set_text_color(&pm10_unit_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_obj_add_style(pm10_unit, LV_OBJ_PART_MAIN, &pm10_unit_style);
+#endif
     /* new new new end */
-
-    
-
 
     // /* task creation for dynamic value handling */
     // // lv_task_create(pm2_5_label_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)pm2_5_label);    /* task to update pm2.5 value on tft display */
     // // lv_task_create(pm10_label_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)pm10_label);      /* task to update pm10 value on tft display */
-    // lv_task_create(voc_label_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)voc_value);   /* task to update voc value on tft display */
-    // lv_task_create(voc_bar_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)voc_bar);       /* task to update the bar graphics of voc  on tft display */
+    // lv_task_create(overall_indicator_bar_refresher_task, 250, LV_TASK_PRIO_MID, (void *)overall_indicator_bar);
+    // lv_task_create(overall_indicator_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)overall_indicator_value);
+    // lv_task_create(voc_label_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)voc_value); /* task to update voc value on tft display */
+    // lv_task_create(voc_bar_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)voc_bar);     /* task to update the bar graphics of voc  on tft display */
     // lv_task_create(co2_label_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)co2_value);   /* task to update the co2 value on tft display */
     // lv_task_create(co2_led_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)co2_bar);       /* task to update the bar graphics of co2 on tft display */
     // lv_task_create(temp_label_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)temp_value); /* task to update pm10 value on tft display */
     // lv_task_create(hum_label_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)hum_value);   /* task to update pm10 value on tft display */
 }
-
 
 /**
  * @brief   callback function to update pm2.5 label data on the display.
@@ -456,6 +680,18 @@ static void pm10_label_value_refresher_task(lv_task_t *task_info)
 {
     /* update label value */
     lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "PM10: \n%.02fug/m3", SPS30_PM10);
+}
+/**
+ * @brief   callback function to update the color of the bar
+ */
+static void overall_indicator_bar_refresher_task(lv_task_t *task_info)
+{
+}
+/**
+ * @brief   callback function to update the status of the overall air condition
+ */
+static void overall_indicator_value_refresher_task(lv_task_t *task_info)
+{
 }
 /**
  * @brief   callback function to update voc label data on the display.
@@ -481,33 +717,34 @@ static void voc_bar_value_refresher_task(lv_task_t *task_info)
      * RED -> UNHEALTHY
      * PURPLE -> VERY UNHEALTHY
      * MAROON -> HAZARDOUS 
-     */ 
-    if (SVM40_VOC >= 0 && SVM40_VOC <= 50)
+     */
+    uint16_t voc_val = (uint16_t)SVM40_VOC;
+    if (voc_val >= 0 && voc_val <= 50)
     {
         lv_style_set_bg_color(&voc_bar_style, LV_STATE_DEFAULT, LV_COLOR_GREEN);
         lv_obj_add_style((lv_obj_t *)(task_info->user_data), LV_BAR_PART_INDIC, &voc_bar_style);
     }
-    else if (SVM40_VOC >= 51 && SVM40_VOC <= 100)
+    else if (voc_val >= 51 && voc_val <= 100)
     {
         lv_style_set_bg_color(&voc_bar_style, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
         lv_obj_add_style((lv_obj_t *)(task_info->user_data), LV_BAR_PART_INDIC, &voc_bar_style);
     }
-    else if (SVM40_VOC >= 101 && SVM40_VOC <= 150)
+    else if (voc_val >= 101 && voc_val <= 150)
     {
         lv_style_set_bg_color(&voc_bar_style, LV_STATE_DEFAULT, LV_COLOR_ORANGE);
         lv_obj_add_style((lv_obj_t *)(task_info->user_data), LV_BAR_PART_INDIC, &voc_bar_style);
     }
-    else if (SVM40_VOC >= 151 && SVM40_VOC <= 200)
+    else if (voc_val >= 151 && voc_val <= 200)
     {
         lv_style_set_bg_color(&voc_bar_style, LV_STATE_DEFAULT, LV_COLOR_RED);
         lv_obj_add_style((lv_obj_t *)(task_info->user_data), LV_BAR_PART_INDIC, &voc_bar_style);
     }
-    else if (SVM40_VOC >= 201 && SVM40_VOC <= 300)
+    else if (voc_val >= 201 && voc_val <= 300)
     {
         lv_style_set_bg_color(&voc_bar_style, LV_STATE_DEFAULT, LV_COLOR_PURPLE);
         lv_obj_add_style((lv_obj_t *)(task_info->user_data), LV_BAR_PART_INDIC, &voc_bar_style);
     }
-    else if (SVM40_VOC >= 301)
+    else if (voc_val >= 301)
     {
         lv_style_set_bg_color(&voc_bar_style, LV_STATE_DEFAULT, LV_COLOR_MAROON);
         lv_obj_add_style((lv_obj_t *)(task_info->user_data), LV_BAR_PART_INDIC, &voc_bar_style);
@@ -516,7 +753,7 @@ static void voc_bar_value_refresher_task(lv_task_t *task_info)
 static void co2_label_value_refresher_task(lv_task_t *task_info)
 {
     /* update value */
-    lv_label_set_text_fmt((lv_obj_t*)(task_info->user_data), "%u", (uint16_t)2500);
+    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "%u", (uint16_t)2500);
     // lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "");
 }
 static void co2_led_value_refresher_task(lv_task_t *task_info)
@@ -569,7 +806,7 @@ static void temp_label_value_refresher_task(lv_task_t *task_info)
 static void hum_label_value_refresher_task(lv_task_t *task_info)
 {
     /* update label value */
-    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "%.01f%%", SVM40_HUM);
+    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "%u%%", (uint8_t)SVM40_HUM);
 }
 
 static void lv_tick_task(void *arg)
