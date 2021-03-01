@@ -27,7 +27,11 @@
     "sensirion_common.h": "c",
     "lv_refr.h": "c",
     "lv_group.h": "c",
-    "lv_obj.h": "c"
+    "lv_obj.h": "c",
+    "svm40.h": "c",
+    "sensirion_config.h": "c",
+    "sensirion_i2c_hal.h": "c",
+    "sensirion_i2c.h": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled"
 }

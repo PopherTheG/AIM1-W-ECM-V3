@@ -23,7 +23,6 @@
 
 /* img sources for icons */
 #include "gui_img.h"
-// LV_IMG_DECLARE(voc_img_map);
 /* end */
 
 #define LV_TICK_PERIOD_MS 1
@@ -127,9 +126,12 @@ static void guiTask(void *pvParameter)
     vTaskDelete(NULL);
 }
 
+static void overall_indicator_pointer_refresher_task(lv_task_t *task_info);
 static void voc_bar_value_refresher_task(lv_task_t *task_info);
 static void co2_label_value_refresher_task(lv_task_t *task_info);
 static void co2_led_value_refresher_task(lv_task_t *task_info);
+static void pm2_5_label_value_refresher_task(lv_task_t *task_info);
+static void pm10_label_value_refresher_task(lv_task_t *task_info);
 
 static lv_style_t screen_style;
 
@@ -163,31 +165,18 @@ void st7899_display_application()
     lv_style_set_bg_color(&screen_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     lv_obj_add_style(screen, LV_OBJ_PART_MAIN, &screen_style);
 
-    lv_color_t hum_border_color = LV_COLOR_GREEN;
-    lv_color_t temp_border_color = LV_COLOR_WHITE;
-    lv_color_t voc_border_color = LV_COLOR_GREEN;
-    lv_color_t co2_border_color = LV_COLOR_GREEN;
-    lv_color_t pm2_5_border_color = LV_COLOR_GREEN;
-    lv_color_t pm10_border_color = LV_COLOR_GREEN;
+    lv_color_t hum_border_color = LV_COLOR_GRAY;
+    lv_color_t temp_border_color = LV_COLOR_GRAY;
+    lv_color_t voc_border_color = LV_COLOR_GRAY;
+    lv_color_t co2_border_color = LV_COLOR_GRAY;
+    lv_color_t pm2_5_border_color = LV_COLOR_GRAY;
+    lv_color_t pm10_border_color = LV_COLOR_GRAY;
+    lv_color_t overall_indicator_border_color = LV_COLOR_GRAY;
 
-    int8_t bar_x_offset = -10;
-    int8_t bar_y_offset = 8;
+    // int8_t bar_x_offset = -10;
+    // int8_t bar_y_offset = 8;
     int8_t row2_y_offset = 110 + 5;
     int8_t row1_y_offset = 40 + 5;
-
-    /* logo */
-    // lv_obj_t *logo_box = lv_obj_create(lv_scr_act(), NULL);
-    // lv_obj_set_size(logo_box, 230, 230/4);
-    // lv_obj_align(logo_box, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 5, 5);
-    // static lv_style_t logo_box_style;
-    // lv_style_init(&logo_box_style);
-    // lv_style_set_bg_color(&logo_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    // lv_style_set_border_color(&logo_box_style, LV_STATE_DEFAULT, box_border_color);
-    // lv_obj_add_style(logo_box, LV_OBJ_PART_MAIN, &logo_box_style);
-
-    // lv_obj_t *logo_icon = lv_img_create(logo_box, NULL);
-    // lv_img_set_src(logo_icon, &logo_img_src);
-    // lv_obj_align(logo_icon, logo_box, LV_ALIGN_CENTER, 0, -3);
 
     /* indicator */
     // lv_obj_t *overall_indicator_bar = lv_bar_create(lv_scr_act(), NULL);
@@ -213,21 +202,35 @@ void st7899_display_application()
     static lv_style_t overall_indicator_box_style;
     lv_style_init(&overall_indicator_box_style);
     lv_style_set_bg_color(&overall_indicator_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
-    lv_style_set_border_color(&overall_indicator_box_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_style_set_border_color(&overall_indicator_box_style, LV_STATE_DEFAULT, overall_indicator_border_color);
     lv_obj_add_style(overall_indicator_box, LV_OBJ_PART_MAIN, &overall_indicator_box_style);
 
     lv_obj_t *overall_indicator_title = lv_label_create(overall_indicator_box, NULL);
     lv_obj_align(overall_indicator_title, overall_indicator_box, LV_ALIGN_IN_LEFT_MID, 2, 0);
-    lv_label_set_text(overall_indicator_title, "AQI");
+    lv_label_set_text(overall_indicator_title, " AQI");
     static lv_style_t overall_indicator_title_style;
     lv_style_init(&overall_indicator_title_style);
     lv_style_set_text_color(&overall_indicator_title_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-    lv_style_set_text_font(&overall_indicator_title_style, LV_STATE_DEFAULT, &lv_font_montserrat_20);
+    lv_style_set_text_font(&overall_indicator_title_style, LV_STATE_DEFAULT, &lv_font_montserrat_22);
     lv_obj_add_style(overall_indicator_title, LV_OBJ_PART_MAIN, &overall_indicator_title_style);
 
     lv_obj_t *overall_indicator_pointer = lv_label_create(overall_indicator_box, NULL);
     lv_label_set_text(overall_indicator_pointer, LV_SYMBOL_EJECT);
-    lv_obj_align(overall_indicator_pointer, overall_indicator_box, LV_ALIGN_IN_BOTTOM_LEFT, 55, 8);
+    /* size per color block is 25 pixels, size between color blocks is 4 pixels */
+    // lv_obj_align(overall_indicator_pointer, overall_indicator_box, LV_ALIGN_IN_BOTTOM_LEFT, 55, 8);
+    lv_obj_set_pos(overall_indicator_pointer, 54, 20); /* Start position of GOOD */
+    // lv_obj_set_pos(overall_indicator_pointer, 79, 20); /* End position of GOOD */
+    // lv_obj_set_pos(overall_indicator_pointer, 83, 20); /* Start position of MODERATE */
+    // lv_obj_set_pos(overall_indicator_pointer, 108, 20); /* End position of MODERATE */
+    // lv_obj_set_pos(overall_indicator_pointer, 112, 20); /* Start position of UNHEALTHY FOR SENSITIVE GROUPS */
+    // lv_obj_set_pos(overall_indicator_pointer, 137, 20); /* End position of UNHEALTHY FOR SENSITIVE GROUPS */
+    // lv_obj_set_pos(overall_indicator_pointer, 141, 20); /* Start position of UNHEALTHY */
+    // lv_obj_set_pos(overall_indicator_pointer, 166, 20); /* End position of UNHEALTHY */
+    // lv_obj_set_pos(overall_indicator_pointer, 170, 20); /* Start position of VERY UNHEALTHY */
+    // lv_obj_set_pos(overall_indicator_pointer, 195, 20); /* End position of VERY UNHEALTHY */
+    // lv_obj_set_pos(overall_indicator_pointer, 199, 20); /* Start position of HAZARDOUS */
+    // lv_obj_set_pos(overall_indicator_pointer, 224, 20); /* End position of HAZARDOUS */
+
     static lv_style_t overall_indicator_pointer_style;
     lv_style_set_text_color(&overall_indicator_pointer_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_style_set_text_font(&overall_indicator_pointer_style, LV_STATE_DEFAULT, &lv_font_montserrat_14);
@@ -254,7 +257,7 @@ void st7899_display_application()
     static lv_style_t overall_indicator_yellow_box_style;
     lv_style_init(&overall_indicator_yellow_box_style);
     lv_style_set_radius(&overall_indicator_yellow_box_style, LV_STATE_DEFAULT, 0);
-    lv_style_set_bg_color(&overall_indicator_yellow_box_style, LV_STATE_DEFAULT, LV_COLOR_GOOD);
+    lv_style_set_bg_color(&overall_indicator_yellow_box_style, LV_STATE_DEFAULT, LV_COLOR_MODERATE);
     lv_style_set_border_color(&overall_indicator_yellow_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     lv_obj_add_style(overall_indicator_yellow_box, LV_OBJ_PART_MAIN, &overall_indicator_yellow_box_style);
 
@@ -264,7 +267,7 @@ void st7899_display_application()
     static lv_style_t overall_indicator_orange_box_style;
     lv_style_init(&overall_indicator_orange_box_style);
     lv_style_set_radius(&overall_indicator_orange_box_style, LV_STATE_DEFAULT, 0);
-    lv_style_set_bg_color(&overall_indicator_orange_box_style, LV_STATE_DEFAULT, LV_COLOR_MODERATE);
+    lv_style_set_bg_color(&overall_indicator_orange_box_style, LV_STATE_DEFAULT, LV_COLOR_UNHEALTHY_FOR_SENSITIVE_GROUPS);
     lv_style_set_border_color(&overall_indicator_orange_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     lv_obj_add_style(overall_indicator_orange_box, LV_OBJ_PART_MAIN, &overall_indicator_orange_box_style);
 
@@ -274,7 +277,7 @@ void st7899_display_application()
     static lv_style_t overall_indicator_maroon_box_style;
     lv_style_init(&overall_indicator_maroon_box_style);
     lv_style_set_radius(&overall_indicator_maroon_box_style, LV_STATE_DEFAULT, 0);
-    lv_style_set_bg_color(&overall_indicator_maroon_box_style, LV_STATE_DEFAULT, LV_COLOR_MODERATE);
+    lv_style_set_bg_color(&overall_indicator_maroon_box_style, LV_STATE_DEFAULT, LV_COLOR_UNHEALTHY);
     lv_style_set_border_color(&overall_indicator_maroon_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     lv_obj_add_style(overall_indicator_maroon_box, LV_OBJ_PART_MAIN, &overall_indicator_maroon_box_style);
 
@@ -284,7 +287,7 @@ void st7899_display_application()
     static lv_style_t overall_indicator_pink_box_style;
     lv_style_init(&overall_indicator_pink_box_style);
     lv_style_set_radius(&overall_indicator_pink_box_style, LV_STATE_DEFAULT, 0);
-    lv_style_set_bg_color(&overall_indicator_pink_box_style, LV_STATE_DEFAULT, LV_COLOR_UNHEALTHY);
+    lv_style_set_bg_color(&overall_indicator_pink_box_style, LV_STATE_DEFAULT, LV_COLOR_VERY_UNHEALTHY);
     lv_style_set_border_color(&overall_indicator_pink_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     lv_obj_add_style(overall_indicator_pink_box, LV_OBJ_PART_MAIN, &overall_indicator_pink_box_style);
 
@@ -294,20 +297,10 @@ void st7899_display_application()
     static lv_style_t overall_indicator_red_box_style;
     lv_style_init(&overall_indicator_red_box_style);
     lv_style_set_radius(&overall_indicator_red_box_style, LV_STATE_DEFAULT, 0);
-    lv_style_set_bg_color(&overall_indicator_red_box_style, LV_STATE_DEFAULT, LV_COLOR_UNHEALTHY);
+    lv_style_set_bg_color(&overall_indicator_red_box_style, LV_STATE_DEFAULT, LV_COLOR_HAZARDOUS);
     lv_style_set_border_color(&overall_indicator_red_box_style, LV_STATE_DEFAULT, LV_COLOR_BLACK);
     lv_obj_add_style(overall_indicator_red_box, LV_OBJ_PART_MAIN, &overall_indicator_red_box_style);
 
-    /*
-    lv_obj_t *overall_indicator_green_box = lv_obj_create(overall_indicator_box, NULL);
-    lv_obj_set_size(overall_indicator_green_box, 230 / 8, (230 / 9) - 2);
-    lv_obj_align(overall_indicator_green_box, overall_indicator_box, LV_ALIGN_IN_LEFT_MID, 0, 0);
-    static lv_style_t overall_indicator_green_box_style;
-    lv_style_init(&overall_indicator_green_box_style);
-    lv_style_set_bg_color(&overall_indicator_green_box_style, LV_STATE_DEFAULT, LV_COLOR_GREEN);
-    lv_style_set_border_color(&overall_indicator_green_box_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
-    lv_obj_add_style(overall_indicator_green_box, LV_OBJ_PART_MAIN, &overall_indicator_green_box_style);
-*/
     /* voc */
     lv_obj_t *voc_box = lv_obj_create(lv_scr_act(), NULL);
     lv_obj_set_size(voc_box, 230 / 2, 230 / 4);
@@ -463,8 +456,8 @@ void st7899_display_application()
     lv_style_set_bg_color(&hum_bar_style, LV_STATE_DEFAULT, LV_COLOR_GREEN);
     lv_obj_add_style(hum_bar, LV_BAR_PART_INDIC, &hum_bar_style);
 
-#define PM_SENSORS_INSTALLED
-#ifdef PM_SENSORS_INSTALLED
+#define SPS30_INSTALLED
+#ifdef SPS30_INSTALLED
     /* pm2.5 */
     lv_obj_t *pm2_5_box = lv_obj_create(lv_scr_act(), NULL);
     lv_obj_set_size(pm2_5_box, 230 / 2, 230 / 4);
@@ -506,15 +499,6 @@ void st7899_display_application()
     lv_style_set_text_color(&pm2_5_label_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_obj_add_style(pm2_5_label, LV_OBJ_PART_MAIN, &pm2_5_label_style);
 
-    lv_obj_t *pm2_5_unit = lv_label_create(pm2_5_box, NULL);
-    lv_label_set_text(pm2_5_unit, "");
-    lv_obj_align(pm2_5_unit, pm2_5_box, LV_ALIGN_IN_BOTTOM_LEFT, 53, 0);
-    static lv_style_t pm2_5_unit_style;
-    lv_style_init(&pm2_5_unit_style);
-    lv_style_set_text_font(&pm2_5_unit_style, LV_STATE_DEFAULT, &lv_font_montserrat_12);
-    lv_style_set_text_color(&pm2_5_unit_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
-    lv_obj_add_style(pm2_5_unit, LV_OBJ_PART_MAIN, &pm2_5_unit_style);
-
     /* pm10 */
     lv_obj_t *pm10_box = lv_obj_create(lv_scr_act(), NULL);
     lv_obj_set_size(pm10_box, 230 / 2, 230 / 4);
@@ -552,18 +536,9 @@ void st7899_display_application()
     lv_obj_align(pm10_label, pm10_box, LV_ALIGN_IN_BOTTOM_LEFT, 3, 0);
     static lv_style_t pm10_label_style;
     lv_style_init(&pm10_label_style);
-    lv_style_set_text_font(&pm10_label_style, LV_STATE_DEFAULT, &lv_font_montserrat_14);
+    lv_style_set_text_font(&pm10_label_style, LV_STATE_DEFAULT, &lv_font_montserrat_12);
     lv_style_set_text_color(&pm10_label_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_obj_add_style(pm10_label, LV_OBJ_PART_MAIN, &pm10_label_style);
-
-    lv_obj_t *pm10_unit = lv_label_create(pm10_box, NULL);
-    lv_label_set_text(pm10_unit, "");
-    lv_obj_align(pm10_unit, pm10_box, LV_ALIGN_IN_BOTTOM_LEFT, 50, 0);
-    static lv_style_t pm10_unit_style;
-    lv_style_init(&pm10_unit_style);
-    lv_style_set_text_font(&pm10_unit_style, LV_STATE_DEFAULT, &lv_font_montserrat_12);
-    lv_style_set_text_color(&pm10_unit_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
-    lv_obj_add_style(pm10_unit, LV_OBJ_PART_MAIN, &pm10_unit_style);
 #else
     /* pm2.5 */
     lv_obj_t *pm2_5_box = lv_obj_create(lv_scr_act(), NULL);
@@ -602,15 +577,6 @@ void st7899_display_application()
     lv_style_set_text_color(&pm2_5_label_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
     lv_obj_add_style(pm2_5_label, LV_OBJ_PART_MAIN, &pm2_5_label_style);
 
-    lv_obj_t *pm2_5_unit = lv_label_create(pm2_5_box, NULL);
-    lv_label_set_text(pm2_5_unit, "");
-    lv_obj_align(pm2_5_unit, pm2_5_box, LV_ALIGN_IN_BOTTOM_LEFT, 53, 0);
-    static lv_style_t pm2_5_unit_style;
-    lv_style_init(&pm2_5_unit_style);
-    lv_style_set_text_font(&pm2_5_unit_style, LV_STATE_DEFAULT, &lv_font_montserrat_12);
-    lv_style_set_text_color(&pm2_5_unit_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
-    lv_obj_add_style(pm2_5_unit, LV_OBJ_PART_MAIN, &pm2_5_unit_style);
-
     /* pm10 */
     lv_obj_t *pm10_box = lv_obj_create(lv_scr_act(), NULL);
     lv_obj_set_size(pm10_box, 230 / 2, 230 / 4);
@@ -648,32 +614,88 @@ void st7899_display_application()
     lv_obj_align(pm10_label, pm10_box, LV_ALIGN_IN_BOTTOM_LEFT, 3, 0);
     static lv_style_t pm10_label_style;
     lv_style_init(&pm10_label_style);
-    lv_style_set_text_font(&pm10_label_style, LV_STATE_DEFAULT, &lv_font_montserrat_14);
+    lv_style_set_text_font(&pm10_label_style, LV_STATE_DEFAULT, &lv_font_montserrat_12);
     lv_style_set_text_color(&pm10_label_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
     lv_obj_add_style(pm10_label, LV_OBJ_PART_MAIN, &pm10_label_style);
-
-    lv_obj_t *pm10_unit = lv_label_create(pm10_box, NULL);
-    lv_label_set_text(pm10_unit, "");
-    lv_obj_align(pm10_unit, pm10_box, LV_ALIGN_IN_BOTTOM_LEFT, 50, 0);
-    static lv_style_t pm10_unit_style;
-    lv_style_init(&pm10_unit_style);
-    lv_style_set_text_font(&pm10_unit_style, LV_STATE_DEFAULT, &lv_font_montserrat_12);
-    lv_style_set_text_color(&pm10_unit_style, LV_STATE_DEFAULT, LV_COLOR_GRAY);
-    lv_obj_add_style(pm10_unit, LV_OBJ_PART_MAIN, &pm10_unit_style);
 #endif
     /* new new new end */
 
     // /* task creation for dynamic value handling */
-    // // lv_task_create(pm2_5_label_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)pm2_5_label);    /* task to update pm2.5 value on tft display */
-    // // lv_task_create(pm10_label_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)pm10_label);      /* task to update pm10 value on tft display */
+    lv_task_create(pm2_5_label_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)pm2_5_value); /* task to update pm2.5 value on tft display */
+    lv_task_create(pm10_label_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)pm10_value);   /* task to update pm10 value on tft display */
     // lv_task_create(overall_indicator_bar_refresher_task, 250, LV_TASK_PRIO_MID, (void *)overall_indicator_bar);
     // lv_task_create(overall_indicator_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)overall_indicator_value);
-    // lv_task_create(voc_label_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)voc_value); /* task to update voc value on tft display */
-    // lv_task_create(voc_bar_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)voc_bar);     /* task to update the bar graphics of voc  on tft display */
+    lv_task_create(voc_label_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)voc_value); /* task to update voc value on tft display */
+    lv_task_create(voc_bar_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)voc_bar);     /* task to update the bar graphics of voc  on tft display */
     // lv_task_create(co2_label_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)co2_value);   /* task to update the co2 value on tft display */
     // lv_task_create(co2_led_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)co2_bar);       /* task to update the bar graphics of co2 on tft display */
-    // lv_task_create(temp_label_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)temp_value); /* task to update pm10 value on tft display */
-    // lv_task_create(hum_label_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)hum_value);   /* task to update pm10 value on tft display */
+    lv_task_create(temp_label_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)temp_value); /* task to update pm10 value on tft display */
+    lv_task_create(hum_label_value_refresher_task, 250, LV_TASK_PRIO_MID, (void *)hum_value);   /* task to update pm10 value on tft display */
+    lv_task_create(overall_indicator_pointer_refresher_task, 250, LV_TASK_PRIO_HIGH, (void *)overall_indicator_pointer);
+}
+
+/**
+ * @brief   callback function to move the pointer according to the voc value
+ */
+static void overall_indicator_pointer_refresher_task(lv_task_t *task_info)
+{
+    /* size per color block is 25 pixels, size between color blocks is 4 pixels */
+    // lv_obj_align(overall_indicator_pointer, overall_indicator_box, LV_ALIGN_IN_BOTTOM_LEFT, 55, 8);
+    // lv_obj_set_pos(overall_indicator_pointer, 54, 20); /* Start position of GOOD */
+    // lv_obj_set_pos(overall_indicator_pointer, 79, 20); /* End position of GOOD */
+    // lv_obj_set_pos(overall_indicator_pointer, 83, 20); /* Start position of MODERATE */
+    // lv_obj_set_pos(overall_indicator_pointer, 108, 20); /* End position of MODERATE */
+    // lv_obj_set_pos(overall_indicator_pointer, 112, 20); /* Start position of UNHEALTHY FOR SENSITIVE GROUPS */
+    // lv_obj_set_pos(overall_indicator_pointer, 137, 20); /* End position of UNHEALTHY FOR SENSITIVE GROUPS */
+    // lv_obj_set_pos(overall_indicator_pointer, 141, 20); /* Start position of UNHEALTHY */
+    // lv_obj_set_pos(overall_indicator_pointer, 166, 20); /* End position of UNHEALTHY */
+    // lv_obj_set_pos(overall_indicator_pointer, 170, 20); /* Start position of VERY UNHEALTHY */
+    // lv_obj_set_pos(overall_indicator_pointer, 195, 20); /* End position of VERY UNHEALTHY */
+    // lv_obj_set_pos(overall_indicator_pointer, 199, 20); /* Start position of HAZARDOUS */
+    // lv_obj_set_pos(overall_indicator_pointer, 224, 20); /* End position of HAZARDOUS */
+
+    uint16_t voc_val = (uint16_t)SVM40_VOC;
+    // uint16_t voc_val = 500;
+
+    /* GOOD range is 0 to 50 (51 units in between) */
+    /* MODERATE range is 51 to 100 (50 units in between)*/
+    /* UNHEALTHY FOR SENSITIVE GROUPS range is 101 to 150 (50 units in between) */
+    /* UNHEALTHY range is 151 to 200 (50 units in between) */
+    /* VERY UNHEALTHY range is 201 to 300 (100 units in between) */
+    /* HAZARDOUS range is 301 to 500 (200 units in between) */
+
+    /* This conditional statements is for adjusting the position of the pointer depending on the VOC value.
+    Each color block has its how scale since not all of them has the same values in between */
+    if (voc_val >= 0 && voc_val <= 50)
+    {
+        uint8_t offset = voc_val / (51 / 25); 
+        lv_obj_set_pos((lv_obj_t *)(task_info->user_data), 54 + offset, 20); 
+    }
+    else if (voc_val >= 51 && voc_val <= 100)
+    {
+        uint8_t offset = (voc_val - 50) / (50 / 25);
+        lv_obj_set_pos((lv_obj_t *)(task_info->user_data), 83 + offset, 20); /* Start position of MODERATE */
+    }
+    else if (voc_val >= 101 && voc_val <= 150)
+    {
+        uint8_t offset = (voc_val - 100) / (50 / 25);
+        lv_obj_set_pos((lv_obj_t *)(task_info->user_data), 112 + offset, 20); /* Start position of UNHEALTHY FOR SENSITIVE GROUPS */
+    }
+    else if (voc_val >= 151 && voc_val <= 200)
+    {
+        uint8_t offset = (voc_val - 150) / (50 / 25);
+        lv_obj_set_pos((lv_obj_t *)(task_info->user_data), 141 + offset, 20); /* Start position of UNHEALTHY */
+    }
+    else if (voc_val >= 201 && voc_val <= 300)
+    {
+        uint8_t offset = (voc_val - 200) / (100 / 25);
+        lv_obj_set_pos((lv_obj_t *)(task_info->user_data), 170 + offset, 20); /* Start position of VERY UNHEALTHY */
+    }
+    else if (voc_val >= 301 && voc_val <= 500)
+    {
+        uint8_t offset = (voc_val - 300) / (200 / 25);
+        lv_obj_set_pos((lv_obj_t *)(task_info->user_data), 199 + offset, 20); /* Start position of HAZARDOUS */
+    }
 }
 
 /**
@@ -682,7 +704,7 @@ void st7899_display_application()
 static void pm2_5_label_value_refresher_task(lv_task_t *task_info)
 {
     /* update label value */
-    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "PM2.5: \n%.02fug/m3", SPS30_PM2_5);
+    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "%.02f", SPS30_PM2_5);
 }
 /**
  * @brief   callback function to update pm10 label data on the display.
@@ -690,19 +712,7 @@ static void pm2_5_label_value_refresher_task(lv_task_t *task_info)
 static void pm10_label_value_refresher_task(lv_task_t *task_info)
 {
     /* update label value */
-    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "PM10: \n%.02fug/m3", SPS30_PM10);
-}
-/**
- * @brief   callback function to update the color of the bar
- */
-static void overall_indicator_bar_refresher_task(lv_task_t *task_info)
-{
-}
-/**
- * @brief   callback function to update the status of the overall air condition
- */
-static void overall_indicator_value_refresher_task(lv_task_t *task_info)
-{
+    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "%.02f", SPS30_PM10);
 }
 /**
  * @brief   callback function to update voc label data on the display.
@@ -711,7 +721,6 @@ static void voc_label_value_refresher_task(lv_task_t *task_info)
 {
     /* update value */
     lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "%u", (uint16_t)SVM40_VOC);
-    // lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "");
 }
 static void voc_bar_value_refresher_task(lv_task_t *task_info)
 {
@@ -732,34 +741,40 @@ static void voc_bar_value_refresher_task(lv_task_t *task_info)
     uint16_t voc_val = (uint16_t)SVM40_VOC;
     if (voc_val >= 0 && voc_val <= 50)
     {
-        lv_style_set_bg_color(&voc_bar_style, LV_STATE_DEFAULT, LV_COLOR_GREEN);
+        lv_style_set_bg_color(&voc_bar_style, LV_STATE_DEFAULT, LV_COLOR_GOOD);
         lv_obj_add_style((lv_obj_t *)(task_info->user_data), LV_BAR_PART_INDIC, &voc_bar_style);
     }
     else if (voc_val >= 51 && voc_val <= 100)
     {
-        lv_style_set_bg_color(&voc_bar_style, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
+        lv_style_set_bg_color(&voc_bar_style, LV_STATE_DEFAULT, LV_COLOR_MODERATE);
         lv_obj_add_style((lv_obj_t *)(task_info->user_data), LV_BAR_PART_INDIC, &voc_bar_style);
     }
     else if (voc_val >= 101 && voc_val <= 150)
     {
-        lv_style_set_bg_color(&voc_bar_style, LV_STATE_DEFAULT, LV_COLOR_ORANGE);
+        lv_style_set_bg_color(&voc_bar_style, LV_STATE_DEFAULT, LV_COLOR_UNHEALTHY_FOR_SENSITIVE_GROUPS);
         lv_obj_add_style((lv_obj_t *)(task_info->user_data), LV_BAR_PART_INDIC, &voc_bar_style);
     }
     else if (voc_val >= 151 && voc_val <= 200)
     {
-        lv_style_set_bg_color(&voc_bar_style, LV_STATE_DEFAULT, LV_COLOR_RED);
+        lv_style_set_bg_color(&voc_bar_style, LV_STATE_DEFAULT, LV_COLOR_UNHEALTHY);
         lv_obj_add_style((lv_obj_t *)(task_info->user_data), LV_BAR_PART_INDIC, &voc_bar_style);
     }
     else if (voc_val >= 201 && voc_val <= 300)
     {
-        lv_style_set_bg_color(&voc_bar_style, LV_STATE_DEFAULT, LV_COLOR_PURPLE);
+        lv_style_set_bg_color(&voc_bar_style, LV_STATE_DEFAULT, LV_COLOR_VERY_UNHEALTHY);
         lv_obj_add_style((lv_obj_t *)(task_info->user_data), LV_BAR_PART_INDIC, &voc_bar_style);
     }
     else if (voc_val >= 301)
     {
-        lv_style_set_bg_color(&voc_bar_style, LV_STATE_DEFAULT, LV_COLOR_MAROON);
+        lv_style_set_bg_color(&voc_bar_style, LV_STATE_DEFAULT, LV_COLOR_HAZARDOUS);
         lv_obj_add_style((lv_obj_t *)(task_info->user_data), LV_BAR_PART_INDIC, &voc_bar_style);
     }
+}
+/**
+ * @brief   callback function to update voc border color
+ */
+static void voc_box_color_refresher_task(lv_task_t *task_info)
+{
 }
 static void co2_label_value_refresher_task(lv_task_t *task_info)
 {
@@ -774,32 +789,32 @@ static void co2_led_value_refresher_task(lv_task_t *task_info)
     lv_bar_set_value((lv_obj_t *)(task_info->user_data), 100, LV_ANIM_OFF);
     if (SCD4x_CO2 >= 0 && SCD4x_CO2 <= 400)
     {
-        lv_style_set_bg_color(&co2_bar_style, LV_STATE_DEFAULT, LV_COLOR_GREEN);
+        lv_style_set_bg_color(&co2_bar_style, LV_STATE_DEFAULT, LV_COLOR_GOOD);
         lv_obj_add_style((lv_obj_t *)(task_info->user_data), LV_BAR_PART_INDIC, &co2_bar_style);
     }
     else if (SCD4x_CO2 >= 401 && SCD4x_CO2 <= 1000)
     {
-        lv_style_set_bg_color(&co2_bar_style, LV_STATE_DEFAULT, LV_COLOR_YELLOW);
+        lv_style_set_bg_color(&co2_bar_style, LV_STATE_DEFAULT, LV_COLOR_MODERATE);
         lv_obj_add_style((lv_obj_t *)(task_info->user_data), LV_BAR_PART_INDIC, &co2_bar_style);
     }
     else if (SCD4x_CO2 >= 1001 && SCD4x_CO2 <= 2000)
     {
-        lv_style_set_bg_color(&co2_bar_style, LV_STATE_DEFAULT, LV_COLOR_ORANGE);
+        lv_style_set_bg_color(&co2_bar_style, LV_STATE_DEFAULT, LV_COLOR_UNHEALTHY_FOR_SENSITIVE_GROUPS);
         lv_obj_add_style((lv_obj_t *)(task_info->user_data), LV_BAR_PART_INDIC, &co2_bar_style);
     }
     else if (SCD4x_CO2 >= 2000 && SCD4x_CO2 <= 5000)
     {
-        lv_style_set_bg_color(&co2_bar_style, LV_STATE_DEFAULT, LV_COLOR_RED);
+        lv_style_set_bg_color(&co2_bar_style, LV_STATE_DEFAULT, LV_COLOR_UNHEALTHY);
         lv_obj_add_style((lv_obj_t *)(task_info->user_data), LV_BAR_PART_INDIC, &co2_bar_style);
     }
     else if (SCD4x_CO2 >= 5001 && SCD4x_CO2 <= 40000)
     {
-        lv_style_set_bg_color(&co2_bar_style, LV_STATE_DEFAULT, LV_COLOR_PURPLE);
+        lv_style_set_bg_color(&co2_bar_style, LV_STATE_DEFAULT, LV_COLOR_VERY_UNHEALTHY);
         lv_obj_add_style((lv_obj_t *)(task_info->user_data), LV_BAR_PART_INDIC, &co2_bar_style);
     }
     else if (SCD4x_CO2 >= 40001)
     {
-        lv_style_set_bg_color(&co2_bar_style, LV_STATE_DEFAULT, LV_COLOR_MAROON);
+        lv_style_set_bg_color(&co2_bar_style, LV_STATE_DEFAULT, LV_COLOR_HAZARDOUS);
         lv_obj_add_style((lv_obj_t *)(task_info->user_data), LV_BAR_PART_INDIC, &co2_bar_style);
     }
 }

@@ -50,7 +50,12 @@
 
 #define I2C_MASTER_PORT I2C_NUM_0
 #define I2C_SDA GPIO_NUM_32
-#define I2C_SCL GPIO_NUM_33
+#define I2C_SCL GPIO_NUM_33  
+
+/* defining sensors used */
+#define SPS30_INSTALLED
+#define SVM40_INSTALLED
+
 
 /* static prototypes */
 static void run_all_samsung_test();
@@ -69,9 +74,14 @@ void app_main(void)
     rmt_tx_init();                                                                    /* initialize ir peripheral of esp32 */
     i2c_initialize(I2C_MODE_MASTER, I2C_SDA, I2C_SCL, true, true, 100000, I2C_NUM_0); /* Slaves connected: SVM40 */
 
+
     gui_start_task(); /* Start task on st7899 display using LVGL library */
+    #ifdef SPS30_INSTALLED
     sps30_start_task(); /* Start task on sps30 to get pm2.5 and pm10 data */
+    #endif
+    #ifdef SVM40_INSTALLED
     svm40_start_task(); /* Start task on svm40 to get temp, hum, and voc data */
+    #endif
     xTaskCreate(run_all_samsung_test, "samsung ac test", 1024 * 2, NULL, 2, NULL);
 }
 
@@ -122,3 +132,7 @@ static void run_all_samsung_test()
         samsung_test_toggle_swing(10);
     }
 }
+
+
+
+// on off mosfet.
