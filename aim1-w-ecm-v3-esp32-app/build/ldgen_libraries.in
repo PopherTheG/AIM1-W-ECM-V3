@@ -76,7 +76,6 @@ $<TARGET_FILE:__idf_lvgl_tft>
 $<TARGET_FILE:__idf_fonts>
 $<TARGET_FILE:__idf_gui>
 $<TARGET_FILE:__idf_irtransmitter>
-$<TARGET_FILE:__idf_lv_examples>
 $<TARGET_FILE:__idf_sensirion-embedded-common>
 $<TARGET_FILE:__idf_sps30>
 $<TARGET_FILE:__idf_svm40>

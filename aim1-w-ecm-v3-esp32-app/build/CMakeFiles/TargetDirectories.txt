@@ -682,13 +682,6 @@ D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/irtransmi
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/irtransmitter/CMakeFiles/edit_cache.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/irtransmitter/CMakeFiles/rebuild_cache.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/irtransmitter/CMakeFiles/list_install_components.dir
-D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/lv_examples/CMakeFiles/__idf_lv_examples.dir
-D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/lv_examples/CMakeFiles/install/local.dir
-D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/lv_examples/CMakeFiles/install.dir
-D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/lv_examples/CMakeFiles/edit_cache.dir
-D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/lv_examples/CMakeFiles/rebuild_cache.dir
-D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/lv_examples/CMakeFiles/list_install_components.dir
-D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/lv_examples/CMakeFiles/install/strip.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/sensirion-embedded-common/CMakeFiles/__idf_sensirion-embedded-common.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/sensirion-embedded-common/CMakeFiles/install/local.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/sensirion-embedded-common/CMakeFiles/install.dir
