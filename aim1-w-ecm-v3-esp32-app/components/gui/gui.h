@@ -44,10 +44,5 @@ void gui_start_task();
 static void lv_tick_task(void *arg);
 static void guiTask(void *pvParameters);
 static void st7899_display_application();
-static void pm2_5_label_value_refresher_task(lv_task_t *task_info);
-static void pm10_label_value_refresher_task(lv_task_t *task_info);
-static void voc_label_value_refresher_task(lv_task_t *task_info);
-static void temp_label_value_refresher_task(lv_task_t *task_info);
-static void hum_label_value_refresher_task(lv_task_t *task_info);
 
 #endif
