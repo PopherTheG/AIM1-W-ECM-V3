@@ -31,7 +31,8 @@
     "svm40.h": "c",
     "sensirion_config.h": "c",
     "sensirion_i2c_hal.h": "c",
-    "sensirion_i2c.h": "c"
+    "sensirion_i2c.h": "c",
+    "cloud_tcp.h": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled"
 }

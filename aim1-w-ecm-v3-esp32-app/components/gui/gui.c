@@ -27,6 +27,49 @@
 
 #define LV_TICK_PERIOD_MS 1
 
+static void lv_tick_task(void *arg);
+static void guiTask(void *pvParameters);
+static void st7899_display_application();
+
+static void overall_indicator_pointer_refresher_task(lv_task_t *task_info);
+static void voc_bar_value_refresher_task(lv_task_t *task_info);
+static void voc_label_value_refresher_task(lv_task_t *task_info);
+static void voc_box_color_refresher_task(lv_task_t *task_info);
+static void co2_label_value_refresher_task(lv_task_t *task_info);
+static void co2_bar_value_refresher_task(lv_task_t *task_info);
+static void pm2_5_label_value_refresher_task(lv_task_t *task_info);
+static void pm2_5_bar_value_refresher_task(lv_task_t *task_info);
+static void pm10_label_value_refresher_task(lv_task_t *task_info);
+static void pm10_bar_value_refresher_task(lv_task_t *tasl_info);
+static void temp_label_value_refresher_task(lv_task_t *task_info);
+static void hum_label_value_refresher_task(lv_task_t *task_info);
+
+static lv_style_t screen_style;
+
+static lv_style_t overall_indicator_bar_style;
+
+static lv_style_t voc_value_style;
+static lv_style_t voc_box_style;
+static lv_style_t voc_bar_style;
+
+static lv_style_t co2_value_style;
+static lv_style_t co2_bar_style;
+
+static lv_style_t pm2_5_value_style;
+static lv_style_t pm2_5_box_style;
+static lv_style_t pm2_5_bar_style;
+
+static lv_style_t pm10_value_style;
+static lv_style_t pm10_box_style;
+static lv_style_t pm10_bar_style;
+
+static lv_style_t temp_value_style;
+static lv_style_t temp_box_style;
+
+static lv_style_t hum_value_style;
+static lv_style_t hum_box_style;
+static lv_style_t hum_bar_style;
+
 /**
  * Creates a semaphore to handle concurrent calls to lvgl stuff.
  * If you wish to call *any* lvgl function from other threads/tasks
@@ -125,45 +168,6 @@ static void guiTask(void *pvParameter)
     /* A task should NEVER return */
     vTaskDelete(NULL);
 }
-
-static void overall_indicator_pointer_refresher_task(lv_task_t *task_info);
-static void voc_bar_value_refresher_task(lv_task_t *task_info);
-static void voc_label_value_refresher_task(lv_task_t *task_info);
-static void voc_box_color_refresher_task(lv_task_t *task_info);
-static void co2_label_value_refresher_task(lv_task_t *task_info);
-static void co2_bar_value_refresher_task(lv_task_t *task_info);
-static void pm2_5_label_value_refresher_task(lv_task_t *task_info);
-static void pm2_5_bar_value_refresher_task(lv_task_t *task_info);
-static void pm10_label_value_refresher_task(lv_task_t *task_info);
-static void pm10_bar_value_refresher_task(lv_task_t *tasl_info);
-static void temp_label_value_refresher_task(lv_task_t *task_info);
-static void hum_label_value_refresher_task(lv_task_t *task_info);
-
-static lv_style_t screen_style;
-
-static lv_style_t overall_indicator_bar_style;
-
-static lv_style_t voc_value_style;
-static lv_style_t voc_box_style;
-static lv_style_t voc_bar_style;
-
-static lv_style_t co2_value_style;
-static lv_style_t co2_bar_style;
-
-static lv_style_t pm2_5_value_style;
-static lv_style_t pm2_5_box_style;
-static lv_style_t pm2_5_bar_style;
-
-static lv_style_t pm10_value_style;
-static lv_style_t pm10_box_style;
-static lv_style_t pm10_bar_style;
-
-static lv_style_t temp_value_style;
-static lv_style_t temp_box_style;
-
-static lv_style_t hum_value_style;
-static lv_style_t hum_box_style;
-static lv_style_t hum_bar_style;
 
 void st7899_display_application()
 {
@@ -737,7 +741,7 @@ static void pm10_label_value_refresher_task(lv_task_t *task_info)
     lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "%.02f", SPS30_PM10);
 }
 /**
- * @brief   callbacl function to update the bar color status level.
+ * @brief   callback function to update the bar color status level.
  */ 
 static void pm10_bar_value_refresher_task(lv_task_t *task_info)
 {

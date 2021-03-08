@@ -41,8 +41,6 @@ extern float SCD4x_CO2;
 #define LV_COLOR_HAZARDOUS                          LV_COLOR_MAKE(0xEB, 0x32, 0x23)
 
 void gui_start_task();
-static void lv_tick_task(void *arg);
-static void guiTask(void *pvParameters);
-static void st7899_display_application();
+
 
 #endif

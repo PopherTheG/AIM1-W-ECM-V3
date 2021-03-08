@@ -1,4 +1,4 @@
-# Install script for directory: C:/esp/esp-idf/components/lvgl
+# Install script for directory: D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/components/lvgl
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

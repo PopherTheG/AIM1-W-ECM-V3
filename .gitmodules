@@ -1,0 +1,3 @@
+[submodule "aim1-w-ecm-v3-esp32-app/components/lvgl"]
+	path = aim1-w-ecm-v3-esp32-app/components/lvgl
+	url = https://github.com/lvgl/lvgl.git

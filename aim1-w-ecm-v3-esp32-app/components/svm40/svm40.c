@@ -142,7 +142,7 @@ static void svm40_task()
             ESP_LOGI(TAG, "SVM30: Measured values\n"
                           "\t%.1f\n"
                           "\t%.2f%%\n"
-                          "\t%.2f°C\n",
+                          "\t%.2fC\n",
                      voc_index / 10.0f, relative_humidity / 100.0f, temperature / 200.0f);
             /* storing results in global variable */
             SVM40_VOC = voc_index / 10.0f;

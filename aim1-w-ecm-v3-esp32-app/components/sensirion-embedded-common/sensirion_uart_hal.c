@@ -40,6 +40,8 @@
 #include "driver/uart.h"
 #include "esp_err.h"
 
+// 25 -> 1
+// 26 -> 3
 
 #define SPS30_UART      UART_NUM_1
 #define TXD_PIN_UART1   GPIO_NUM_25

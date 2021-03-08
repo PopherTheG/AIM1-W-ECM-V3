@@ -96,7 +96,7 @@ int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count)
     i2c_master_write_byte(cmd, (address << 1) | I2C_MASTER_READ, 1);
     i2c_master_read(cmd, data, count, I2C_MASTER_LAST_NACK);
     i2c_master_stop(cmd);
-    err = i2c_master_cmd_begin(I2C_NUM_0, cmd, 200 / portTICK_PERIOD_MS);
+    err = i2c_master_cmd_begin(I2C_NUM_1, cmd, 200 / portTICK_PERIOD_MS);
     i2c_cmd_link_delete(cmd);
 
     if (err == ESP_OK)
@@ -127,7 +127,7 @@ int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count)
     i2c_master_write_byte(cmd, (address << 1) | I2C_MASTER_WRITE, 1);
     i2c_master_write(cmd, data, count, 1);
     i2c_master_stop(cmd);
-    err = i2c_master_cmd_begin(I2C_NUM_0, cmd, 200 / portTICK_PERIOD_MS);
+    err = i2c_master_cmd_begin(I2C_NUM_1, cmd, 200 / portTICK_PERIOD_MS);
     i2c_cmd_link_delete(cmd);
 
     if (err == ESP_OK)

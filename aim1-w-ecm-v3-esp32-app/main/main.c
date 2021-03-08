@@ -48,9 +48,10 @@
 
 #define TAG "MAIN.C"
 
-#define I2C_MASTER_PORT I2C_NUM_0
-#define I2C_SDA GPIO_NUM_32
-#define I2C_SCL GPIO_NUM_33  
+#define I2C1_SDA    GPIO_NUM_32
+#define I2C1_SCL    GPIO_NUM_33  
+#define I2C2_SDA    GPIO_NUM_27
+#define I2C2_SCL    GPIO_NUM_14 
 
 /* defining sensors used */
 #define SPS30_INSTALLED
@@ -71,8 +72,9 @@ float SCD4x_CO2;
 
 void app_main(void)
 {
-    rmt_tx_init();                                                                    /* initialize ir peripheral of esp32 */
-    i2c_initialize(I2C_MODE_MASTER, I2C_SDA, I2C_SCL, true, true, 100000, I2C_NUM_0); /* Slaves connected: SVM40 */
+    rmt_tx_init();                                                                              /* initialize ir peripheral of esp32 */
+    i2c_initialize(I2C_MODE_MASTER, I2C1_SDA, I2C1_SCL, true, true, 100000, I2C_NUM_0);         /* Slaves connected: SVM40 */
+    i2c_initialize(I2C_MODE_MASTER, I2C2_SDA, I2C2_SCL, true, true, 100000, I2C_NUM_1);
 
 
     gui_start_task(); /* Start task on st7899 display using LVGL library */
