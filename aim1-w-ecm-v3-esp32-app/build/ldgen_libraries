@@ -65,13 +65,15 @@ D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/unity/lib
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/wifi_provisioning/libwifi_provisioning.a
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/main/libmain.a
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/cloud/libcloud.a
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/esp32-wifi-manager/libesp32-wifi-manager.a
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/fonts/libfonts.a
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/lvgl/liblvgl.a
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/lvgl_esp32_drivers/liblvgl_esp32_drivers.a
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/gui/libgui.a
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/irtransmitter/libirtransmitter.a
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/sensirion-embedded-common/libsensirion-embedded-common.a
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/sgp_40_voc_index/libsgp_40_voc_index.a
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/smart_wifi/libsmart_wifi.a
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/sps30/libsps30.a
-D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/svm40/libsvm40.a
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/lvgl_touch/liblvgl_touch.a
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/lvgl_tft/liblvgl_tft.a

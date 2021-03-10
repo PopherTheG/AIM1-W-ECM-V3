@@ -28,9 +28,9 @@
 contains sensor values */
 extern float SPS30_PM2_5;
 extern float SPS30_PM10;
-extern float SVM40_VOC;
-extern float SVM40_HUM;
-extern float SVM40_TEMP;
+extern int32_t SGP40_VOC;
+extern float SHT4X_HUM;
+extern float SHT4X_TEMP;
 extern float SCD4x_CO2;
 
 #define LV_COLOR_GOOD                               LV_COLOR_MAKE(0x28, 0x96, 0x3C)

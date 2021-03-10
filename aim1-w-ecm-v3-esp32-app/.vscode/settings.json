@@ -32,7 +32,11 @@
     "sensirion_config.h": "c",
     "sensirion_i2c_hal.h": "c",
     "sensirion_i2c.h": "c",
-    "cloud_tcp.h": "c"
+    "cloud_tcp.h": "c",
+    "sht4x.h": "c",
+    "sht_git_version.h": "c",
+    "sgp_git_version.h": "c",
+    "sgp40.h": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled"
 }

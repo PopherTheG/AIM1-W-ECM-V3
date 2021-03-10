@@ -14,7 +14,7 @@ typedef struct smart_wifi_event {
     smart_wifi_event_id_t id;
 } smart_wifi_event_t;
 
-typedef void (*smart_wifi_app_cb)(smart_wifi_event *evt);
+typedef void (*smart_wifi_app_cb)(smart_wifi_event_t *evt);
 
 void initialise_wifi(smart_wifi_app_cb app_cb);
 

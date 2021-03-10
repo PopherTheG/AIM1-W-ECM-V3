@@ -65,13 +65,15 @@ $<TARGET_FILE:__idf_unity>
 $<TARGET_FILE:__idf_wifi_provisioning>
 $<TARGET_FILE:__idf_main>
 $<TARGET_FILE:__idf_cloud>
+$<TARGET_FILE:__idf_esp32-wifi-manager>
 $<TARGET_FILE:__idf_fonts>
 $<TARGET_FILE:__idf_lvgl>
 $<TARGET_FILE:__idf_lvgl_esp32_drivers>
 $<TARGET_FILE:__idf_gui>
 $<TARGET_FILE:__idf_irtransmitter>
 $<TARGET_FILE:__idf_sensirion-embedded-common>
+$<TARGET_FILE:__idf_sgp_40_voc_index>
+$<TARGET_FILE:__idf_smart_wifi>
 $<TARGET_FILE:__idf_sps30>
-$<TARGET_FILE:__idf_svm40>
 $<TARGET_FILE:__idf_lvgl_touch>
 $<TARGET_FILE:__idf_lvgl_tft>

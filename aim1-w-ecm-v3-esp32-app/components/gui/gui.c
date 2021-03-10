@@ -630,7 +630,7 @@ static void overall_indicator_pointer_refresher_task(lv_task_t *task_info)
     // lv_obj_set_pos(overall_indicator_pointer, 199, 20); /* Start position of HAZARDOUS */
     // lv_obj_set_pos(overall_indicator_pointer, 224, 20); /* End position of HAZARDOUS */
 
-    uint16_t voc_val = (uint16_t)SVM40_VOC;
+    uint16_t voc_val = (uint16_t)SGP40_VOC;
 
     /* GOOD range is 0 to 50 (51 units in between) */
     /* MODERATE range is 51 to 100 (50 units in between)*/
@@ -797,7 +797,7 @@ static void pm10_bar_value_refresher_task(lv_task_t *task_info)
 static void voc_label_value_refresher_task(lv_task_t *task_info)
 {
     /* update value */
-    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "%u", (uint16_t)SVM40_VOC);
+    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "%u", (uint16_t)SGP40_VOC);
 }
 /**
  * @brief   callback function to update the bar color status level.
@@ -805,7 +805,7 @@ static void voc_label_value_refresher_task(lv_task_t *task_info)
 static void voc_bar_value_refresher_task(lv_task_t *task_info)
 {
     /* update value */
-    // int16_t scaled_voc_value = SVM40_VOC / 5;
+    // int16_t scaled_voc_value = SGP40_VOC / 5;
     // lv_bar_set_anim_time((lv_obj_t *)(task_info->user_data), 200);
     lv_bar_set_value((lv_obj_t *)(task_info->user_data), 100, LV_ANIM_OFF);
 
@@ -818,7 +818,7 @@ static void voc_bar_value_refresher_task(lv_task_t *task_info)
      * PURPLE -> VERY UNHEALTHY
      * MAROON -> HAZARDOUS 
      */
-    uint16_t voc_val = (uint16_t)SVM40_VOC;
+    uint16_t voc_val = (uint16_t)SGP40_VOC;
     if (voc_val >= 0 && voc_val <= 50)
     {
         lv_style_set_bg_color(&voc_bar_style, LV_STATE_DEFAULT, LV_COLOR_GOOD);
@@ -912,7 +912,7 @@ static void co2_bar_value_refresher_task(lv_task_t *task_info)
 static void temp_label_value_refresher_task(lv_task_t *task_info)
 {
     /* update label value */
-    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "%.01fC", SVM40_TEMP);
+    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "%.01fC", SHT4X_TEMP);
 }
 
 /**
@@ -921,7 +921,7 @@ static void temp_label_value_refresher_task(lv_task_t *task_info)
 static void hum_label_value_refresher_task(lv_task_t *task_info)
 {
     /* update label value */
-    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "%u%%", (uint8_t)SVM40_HUM);
+    lv_label_set_text_fmt((lv_obj_t *)(task_info->user_data), "%u%%", (uint8_t)SHT4X_HUM);
 }
 
 static void lv_tick_task(void *arg)

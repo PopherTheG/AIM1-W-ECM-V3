@@ -7,3 +7,4 @@ idf_component_register(SRCS ${SOURCES}
                        REQUIRES lvgl)
 
 endif()
+

@@ -1,4 +1,4 @@
-# Install script for directory: D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/components/svm40
+# Install script for directory: D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/components/sgp_40_voc_index
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
