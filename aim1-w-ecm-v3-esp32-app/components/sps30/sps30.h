@@ -74,11 +74,6 @@ struct sps30_version_information {
 void sps30_start_task(); 
 
 /**
- * sps30_task() - create a task for sps30 which reads sensor data
- */ 
-static void sps30_task();
-
-/**
  * sps_get_driver_version() - Return the driver version
  * Return:  Driver version string
  */

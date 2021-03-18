@@ -63,6 +63,10 @@
 #include "gui.h"
 /* end */
 
+/* io expander related includes */
+#include "io_task.h"
+/* end */
+
 #define TAG "MAIN.C"
 
 #define I2C1_SDA GPIO_NUM_32
@@ -84,16 +88,9 @@
 #define SGP40_INSTALLED
 #define SHT40_INSTALLED
 
-/* static prototypes */
-static void run_all_samsung_test();
-static void i2c_initialize(i2c_mode_t mode, int sda_io_num, int scl_io_num, bool sda_pullup_en, bool scl_pullup_en, uint32_t clk_speed, i2c_port_t i2c_num);
-
 /*** Global Data - Values from sensors (SPS30, SGP40) ***/
 float SPS30_PM2_5;
 float SPS30_PM10;
-// float SVM40_VOC;
-// float SVM40_HUM;
-// float SVM40_TEMP;
 int32_t SGP40_VOC;
 float SHT4X_HUM;
 float SHT4X_TEMP;
@@ -107,6 +104,8 @@ uint8_t chipId[6] = {0};
 
 static uint8_t device_type = 0;
 
+/* static prototypes */
+static void run_all_samsung_test();
 static void system_init(void);
 static void i2c_initialize(i2c_mode_t mode, int sda_io_num, int scl_io_num, bool sda_pullup_en, bool scl_pullup_en, uint32_t clk_speed, i2c_port_t i2c_num);
 static void cloud_cb(cloud_event_t *evt);
@@ -121,21 +120,31 @@ void app_main(void)
 {
     system_init();
 
+#ifdef SPS30_INSTALLED
+    /* Start task on sps30 to get pm2.5 and pm10 data */
+    // sps30_start_task();
+#endif
+    /* Start task on getting VOC index, temperature and humidity */
+    /* this task must be called right after the initialization of the I2C
+    Not doing so will affect the probing of SHT4x ( call this before wifi manager ) */
+    sgp40_voc_index_start_task();
+
+    /* Start task on st7899 display using LVGL library */
+    gui_start_task();
+
     esp_efuse_mac_get_default(chipId);
     sprintf(serial, "%d%d%d%d%d%d", chipId[0], chipId[1], chipId[2], chipId[3], chipId[4], chipId[5]);
     ESP_LOGI(TAG, "%s", serial);
 
     ESP_LOGI(TAG, "Long serial: %lld", strtoll(serial, NULL, 0));
 
-
+    /* Used to connect set up the SSID and PASSWORD through a phone */
     wifi_manager_start();
+    /* Once internet connection is established. Connect to the cloud
+    with the callback cb_connection_ok */
     wifi_manager_set_callback(WM_EVENT_STA_GOT_IP, &cb_connection_ok);
 
-    gui_start_task(); /* Start task on st7899 display using LVGL library */
-#ifdef SPS30_INSTALLED
-    // sps30_start_task(); /* Start task on sps30 to get pm2.5 and pm10 data */
-#endif
-    sgp40_voc_index_start_task();
+    /* Create and start task to run a test on actuating the samsung airconditioner */
     // xTaskCreate(run_all_samsung_test, "samsung ac test", 1024 * 2, NULL, 2, NULL);
 }
 
@@ -154,9 +163,13 @@ static void system_init(void)
     setenv("TZ", "PST-8", 1);
     tzset();
 
-    rmt_tx_init(); /* initialize ir peripheral of esp32 */
+    // rmt_tx_init(); /* initialize ir peripheral of esp32 */
     i2c_initialize(I2C_MODE_MASTER, I2C1_SDA, I2C1_SCL, true, true, 100000, I2C_NUM_0);
-    i2c_initialize(I2C_MODE_MASTER, I2C2_SDA, I2C2_SCL, true, true, 100000, I2C_NUM_1); /* Slaves connected: SGP40 SHT4X */
+    i2c_initialize(I2C_MODE_MASTER, I2C2_SDA, I2C2_SCL, true, true, 100000, I2C_NUM_1); /* Slaves connected: SGP40, SHT4X, IO Expander on DEX*/
+    io_init();
+    io_redled_set_level(0);
+    io_blueled_set_level(0);
+    io_greenled_set_level(0);
 }
 
 /**
@@ -201,9 +214,9 @@ static void run_all_samsung_test()
         samsung_test_cool_medfan();
         samsung_test_cool_highfan();
         samsung_test_dry();
-        samsung_test_auto();
-        samsung_test_toggle_air_direction(10);
-        samsung_test_toggle_swing(10);
+        // samsung_test_auto();
+        // samsung_test_toggle_air_direction(10);
+        // samsung_test_toggle_swing(10);
     }
 }
 
@@ -214,16 +227,18 @@ static void cloud_cb(cloud_event_t *evt)
     {
     case CLOUD_EVT_CONNECT:
         ESP_LOGI(TAG, "CLOUD_EVT_CONNECT");
+
         // const char *ver = ota_get_version();
         // ESP_LOGI(TAG, "Current Version: %s", ver);
         // ota_start();
         // uint64_t id = strtoull(serial, NULL, 0);
         // telemetry_start(&id);
+
         break;
 
     case CLOUD_EVT_DISCONNECT:
         ESP_LOGI(TAG, "CLOUD_EVT_DISCONNECT");
-        // temetry_stop();
+        // telemetry_stop();
         break;
 
     case CLOUD_EVT_RECONNECT:
@@ -234,31 +249,32 @@ static void cloud_cb(cloud_event_t *evt)
         ESP_LOGI(TAG, "CLOUD_EVT_DATA_MQTT");
         sent = 0;
 
-        ESP_LOGI(TAG, "MQTT Data Received");
+        ESP_LOGI(TAG, "MQTT Data received");
         ESP_LOGI(TAG, "Topic=%.*s", evt->evt.data.mqtt.topic_len, evt->evt.data.mqtt.topic);
         ESP_LOGI(TAG, "Data=%.*s", evt->evt.data.mqtt.len, evt->evt.data.mqtt.data);
         break;
 
     default:
-        ESP_LOGI(TAG, "UNKOWN_CLOUD_EVENT %d", evt->id);
+        ESP_LOGI(TAG, "UNKNOW_CLOUD_EVENT %d", evt->id);
         break;
     }
 }
 
 static void connect_to_cloud(void)
 {
-    cloud_api_init(cloud_cb, CLOUD_TYPE_MQTT);
+    cloud_ret_t cloud_ret = cloud_api_connect();
+    cloud_api_init(cloud_cb);
     cloud_api_set_mqtt_id(serial);
 
-    cloud_ret_t cloud_ret = cloud_api_connect_host(HOST, PORT);
+    // cloud_ret_t cloud_ret = cloud_api_connect_host(HOST, PORT);
 
     if (cloud_ret == CLOUD_RET_OK)
     {
         ESP_LOGI(TAG, "Cloud Connected\r\n");
     }
-    else if (cloud_ret == CLOUD_RET_UNKOWN_PROTOCOL)
+    else if (cloud_ret == CLOUD_RET_UNKNOWN_PROTOCOL)
     {
-        ESP_LOGI(TAG, "Cloud Unkown Protocol\r\n");
+        ESP_LOGI(TAG, "Cloud Unknown Protocol\r\n");
     }
 }
 

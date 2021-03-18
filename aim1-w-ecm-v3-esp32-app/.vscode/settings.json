@@ -36,7 +36,18 @@
     "sht4x.h": "c",
     "sht_git_version.h": "c",
     "sgp_git_version.h": "c",
-    "sgp40.h": "c"
+    "sgp40.h": "c",
+    "cloud_api.h": "c",
+    "sensirion_sleep.h": "c",
+    "xutility": "cpp",
+    "gpio.h": "c",
+    "io_task.h": "c",
+    "sps30.h": "c",
+    "esp_log.h": "c",
+    "nvs_flash.h": "c",
+    "esp_partition.h": "c",
+    "cloud_config_default.h": "c",
+    "telemetry_encoder.h": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled"
 }

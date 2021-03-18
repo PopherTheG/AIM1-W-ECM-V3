@@ -9,8 +9,8 @@
 
 #include "samsung_ir_codes.h"
 
-#define IR_LED_PIN GPIO_NUM_15
-#define IR_RMT_CHANNEL RMT_CHANNEL_0
+#define IR_LED_PIN          GPIO_NUM_15
+#define IR_RMT_CHANNEL      RMT_CHANNEL_0
 #define TAG "irtransmitter.c"
 
 void rmt_tx_init(void)
@@ -95,7 +95,7 @@ void samsung_cool_lowfan(uint32_t temp)
         ESP_LOGW("WARNING", "Temp you sent is not acknowledged only from 17-30");
         break;
     }
-    ESP_LOGI(TAG, "SAMSUNG COOL LOWFAN %u", temp);
+    // ESP_LOGI(TAG, "SAMSUNG COOL LOWFAN %u", temp);
 }
 
 void samsung_cool_medfan(uint32_t temp)
@@ -148,7 +148,7 @@ void samsung_cool_medfan(uint32_t temp)
         ESP_LOGW("WARNING", "Temp you sent is not acknowledged onle from 17-30");
         break;
     }
-    ESP_LOGI(TAG, "SAMSUNG COOL MEDFAN %u", temp);
+    // ESP_LOGI(TAG, "SAMSUNG COOL MEDFAN %u", temp);
 }
 
 void samsung_cool_highfan(uint32_t temp)
@@ -201,7 +201,7 @@ void samsung_cool_highfan(uint32_t temp)
         ESP_LOGW("WARNING", "Temp you sent is not acknowledged only from 17-30");
         break;
     }
-    ESP_LOGI(TAG, "SAMSUNG COOL HIGHFAN %u", temp);
+    // ESP_LOGI(TAG, "SAMSUNG COOL HIGHFAN %u", temp);
 }
 
 void samsung_cool_autofan(uint32_t temp)
@@ -254,7 +254,7 @@ void samsung_cool_autofan(uint32_t temp)
         ESP_LOGW("WARNING", "Temp you sent is not acknowledged only from 17-30");
         break;
     }
-    ESP_LOGI(TAG, "SAMSUNG COOL AUTOFAN %u", temp);
+    // ESP_LOGI(TAG, "SAMSUNG COOL AUTOFAN %u", temp);
 }
 
 void samsung_dry(uint32_t temp)
@@ -307,34 +307,34 @@ void samsung_dry(uint32_t temp)
         ESP_LOGW("WARNING", "Temp you sent is not acknowledged only from 17-30");
         break;
     }
-    ESP_LOGI(TAG, "SAMSUNG DRY %u", temp);
+    // ESP_LOGI(TAG, "SAMSUNG DRY %u", temp);
 }
 
 
 void samsung_fan_lowfan()
 {
     ESP_ERROR_CHECK(rmt_write_items(IR_RMT_CHANNEL, SAMSUNG_TURN_ON_AC_FAN_LOWFAN, sizeof(SAMSUNG_TURN_ON_AC_FAN_LOWFAN) / sizeof(SAMSUNG_TURN_ON_AC_FAN_LOWFAN[0]), true));
-    ESP_LOGI(TAG, "SAMSUNG FAN LOWFAN");
+    // ESP_LOGI(TAG, "SAMSUNG FAN LOWFAN");
 }
 
 void samsung_fan_medfan()
 {
     ESP_ERROR_CHECK(rmt_write_items(IR_RMT_CHANNEL, SAMSUNG_TURN_ON_AC_FAN_MEDFAN, sizeof(SAMSUNG_TURN_ON_AC_FAN_MEDFAN) / sizeof(SAMSUNG_TURN_ON_AC_FAN_MEDFAN[0]), true));
-    ESP_LOGI(TAG, "SAMSUNG FAN MEDFAN");
+    // ESP_LOGI(TAG, "SAMSUNG FAN MEDFAN");
 }
 
 
 void samsung_fan_highfan()
 {
     ESP_ERROR_CHECK(rmt_write_items(IR_RMT_CHANNEL, SAMSUNG_TURN_ON_AC_FAN_HIGHFAN, sizeof(SAMSUNG_TURN_ON_AC_FAN_HIGHFAN) / sizeof(SAMSUNG_TURN_ON_AC_FAN_HIGHFAN[0]), true));
-    ESP_LOGI(TAG, "SAMSUNG FAN HIGHFAN");
+    // ESP_LOGI(TAG, "SAMSUNG FAN HIGHFAN");
 }
 
 
 void samsung_fan_autofan()
 {
     ESP_ERROR_CHECK(rmt_write_items(IR_RMT_CHANNEL, SAMSUNG_TURN_ON_AC_FAN_AUTOFAN, sizeof(SAMSUNG_TURN_ON_AC_FAN_AUTOFAN) / sizeof(SAMSUNG_TURN_ON_AC_FAN_AUTOFAN[0]), true));
-    ESP_LOGI(TAG, "SAMSUNG FAN AUTOFAN");
+    // ESP_LOGI(TAG, "SAMSUNG FAN AUTOFAN");
 }
 
 void samsung_auto(uint32_t temp)
@@ -387,33 +387,33 @@ void samsung_auto(uint32_t temp)
         ESP_LOGW("WARNING", "Temp you sent is not acknowledged only from 17-30");
         break;
     }
-    ESP_LOGI(TAG, "SAMSUNG AUTO %u", temp);
+    // ESP_LOGI(TAG, "SAMSUNG AUTO %u", temp);
 }
 
 
 void samsung_toggle_air_direction()
 {
     ESP_ERROR_CHECK(rmt_write_items(IR_RMT_CHANNEL, SAMSUNG_AC_TOGGLE_AIR_DIRECION, sizeof(SAMSUNG_AC_TOGGLE_AIR_DIRECION) / sizeof(SAMSUNG_AC_TOGGLE_AIR_DIRECION[0]), true));
-    ESP_LOGI(TAG, "SAMSUNG TOGGLE AIR DIRECTION");
+    // ESP_LOGI(TAG, "SAMSUNG TOGGLE AIR DIRECTION");
 }
 
 void samsung_toggle_swing()
 {
     ESP_ERROR_CHECK(rmt_write_items(IR_RMT_CHANNEL, SAMSUNG_AC_TOGGLE_SWING, sizeof(SAMSUNG_AC_TOGGLE_SWING) / sizeof(SAMSUNG_AC_TOGGLE_SWING[0]), true));
-    ESP_LOGI(TAG, "SAMSUNG TOGGLE SWING");
+    // ESP_LOGI(TAG, "SAMSUNG TOGGLE SWING");
 }
 
 
 void samsung_toggle_turbo()
 {
     ESP_ERROR_CHECK(rmt_write_items(IR_RMT_CHANNEL, SAMSUNG_AC_TOGGLE_TURBO, sizeof(SAMSUNG_AC_TOGGLE_TURBO) / sizeof(SAMSUNG_AC_TOGGLE_TURBO[0]), true));
-    ESP_LOGI(TAG, "SAMSUNG TOGGLE TURBO");
+    // ESP_LOGI(TAG, "SAMSUNG TOGGLE TURBO");
 }
 
 void samsung_off()
 {
     ESP_ERROR_CHECK(rmt_write_items(IR_RMT_CHANNEL, SAMSUNG_TURN_OFF_AC, sizeof(SAMSUNG_TURN_OFF_AC) / sizeof(SAMSUNG_TURN_OFF_AC[0]), true));
-    ESP_LOGI(TAG, "SAMSUNG OFF");
+    // ESP_LOGI(TAG, "SAMSUNG OFF");
 }
 
 /*** END SAMSUNG ***/

@@ -6,6 +6,9 @@
 #include "sensirion_sleep.h"
 #include "sgp40_voc_index.h"
 #include "sgp40_voc_index_task.h"
+#include "cloud_api.h"
+#include "cloud_mqtt.h"
+
 
 static void sgp40_voc_index_task();
 
@@ -43,6 +46,9 @@ static void sgp40_voc_index_task()
             SGP40_VOC = voc_index;
             SHT4X_TEMP = temperature_celsius * 0.001f;
             SHT4X_HUM = relative_humidity_percent * 0.001f;
+            // uint8_t sample_data = 25;
+            // cloud_mqtt_publish("xeleqt/aim1-w-ecm/hardware/voc", (uint8_t *)sample_data, 1, 0);
+
         }
         else 
         {

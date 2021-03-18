@@ -74,6 +74,8 @@
 #define SPS30_CMD_RESET 0xd3
 #define SPS30_ERR_STATE(state) (SPS30_ERR_STATE_MASK | (state))
 
+static void sps30_task();
+
 void sps30_start_task()
 {
     xTaskCreate(sps30_task, "sps30 task", 1024 * 4, NULL, 2, NULL);

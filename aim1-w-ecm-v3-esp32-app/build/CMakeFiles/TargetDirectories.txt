@@ -608,6 +608,13 @@ D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/main/CMak
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/main/CMakeFiles/rebuild_cache.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/main/CMakeFiles/list_install_components.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/main/CMakeFiles/install/strip.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/TCA6416A/CMakeFiles/install/strip.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/TCA6416A/CMakeFiles/__idf_TCA6416A.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/TCA6416A/CMakeFiles/install/local.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/TCA6416A/CMakeFiles/install.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/TCA6416A/CMakeFiles/edit_cache.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/TCA6416A/CMakeFiles/rebuild_cache.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/TCA6416A/CMakeFiles/list_install_components.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/cloud/CMakeFiles/list_install_components.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/cloud/CMakeFiles/__idf_cloud.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/cloud/CMakeFiles/install/local.dir
@@ -650,6 +657,13 @@ D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/gui/CMake
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/gui/CMakeFiles/rebuild_cache.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/gui/CMakeFiles/list_install_components.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/gui/CMakeFiles/install/strip.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/io_task/CMakeFiles/__idf_io_task.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/io_task/CMakeFiles/install/local.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/io_task/CMakeFiles/install.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/io_task/CMakeFiles/edit_cache.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/io_task/CMakeFiles/rebuild_cache.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/io_task/CMakeFiles/list_install_components.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/io_task/CMakeFiles/install/strip.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/irtransmitter/CMakeFiles/install/strip.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/irtransmitter/CMakeFiles/__idf_irtransmitter.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/irtransmitter/CMakeFiles/install/local.dir
