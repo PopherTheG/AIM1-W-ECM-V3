@@ -45,7 +45,7 @@ and samsung_toggle_turbo are just modifiers to the current setting.
 
 Further explanation on this is found in samsung_ir_codes.h */
 
-void samsung_cool_lowfan(uint32_t temp)
+void samsung_cool_lowfan(uint8_t temp)
 {
     switch (temp)
     {
@@ -98,7 +98,7 @@ void samsung_cool_lowfan(uint32_t temp)
     // ESP_LOGI(TAG, "SAMSUNG COOL LOWFAN %u", temp);
 }
 
-void samsung_cool_medfan(uint32_t temp)
+void samsung_cool_medfan(uint8_t temp)
 {
     switch (temp)
     {
@@ -151,7 +151,7 @@ void samsung_cool_medfan(uint32_t temp)
     // ESP_LOGI(TAG, "SAMSUNG COOL MEDFAN %u", temp);
 }
 
-void samsung_cool_highfan(uint32_t temp)
+void samsung_cool_highfan(uint8_t temp)
 {
     switch (temp)
     {
@@ -204,7 +204,7 @@ void samsung_cool_highfan(uint32_t temp)
     // ESP_LOGI(TAG, "SAMSUNG COOL HIGHFAN %u", temp);
 }
 
-void samsung_cool_autofan(uint32_t temp)
+void samsung_cool_autofan(uint8_t temp)
 {
     switch (temp)
     {
@@ -257,7 +257,7 @@ void samsung_cool_autofan(uint32_t temp)
     // ESP_LOGI(TAG, "SAMSUNG COOL AUTOFAN %u", temp);
 }
 
-void samsung_dry(uint32_t temp)
+void samsung_dry(uint8_t temp)
 {
     switch (temp)
     {
@@ -337,7 +337,7 @@ void samsung_fan_autofan()
     // ESP_LOGI(TAG, "SAMSUNG FAN AUTOFAN");
 }
 
-void samsung_auto(uint32_t temp)
+void samsung_auto(uint8_t temp)
 {
     switch (temp)
     {

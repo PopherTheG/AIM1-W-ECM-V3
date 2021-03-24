@@ -393,3 +393,7 @@ void io_relay_set_level(uint8_t level)
     }
     xQueueSendToBack(tca6416a_out_queue, &event, pdMS_TO_TICKS(100));
 }
+
+uint8_t io_relay_get_level(void) {
+    return relay_level;
+}

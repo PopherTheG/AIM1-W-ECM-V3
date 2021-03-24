@@ -26,32 +26,32 @@ void rmt_tx_init(void);
  * @brief Command for samsung to set the mode to COOL and fan speed to LOW.
  * @param temp Desired temperature
  */  
-void samsung_cool_lowfan(uint32_t temp);
+void samsung_cool_lowfan(uint8_t temp);
 
 /**
  * @brief Command for samsung to set the mode to COOL and fan speed to MED.
  * @param temp Desired temperature.
  */
-void samsung_cool_medfan(uint32_t temp);
+void samsung_cool_medfan(uint8_t temp);
 
 /**
  * @brief Command for samsung to set the mode to COOL and fan speed to HIGH.
  * @param temp Desired temperature.
  */
-void samsung_cool_highfan(uint32_t temp);
+void samsung_cool_highfan(uint8_t temp);
 
 /**
  * @brief Command for samsung to set the mode to COOL and fan speed to AUTO.
  * @param temp Desired temperature.
  */
-void samsung_cool_autofan(uint32_t temp);
+void samsung_cool_autofan(uint8_t temp);
 
 /**
  * @brief Command for samsunt to set the mode to DRY. There is no fan speed 
  * control for DRY mode.
  * @param temp Desired temperature.
  */ 
-void samsung_dry(uint32_t temp);
+void samsung_dry(uint8_t temp);
 
 /**
  * @brief Command for samsung to set the mode to FAN with a fan speed of LOW.

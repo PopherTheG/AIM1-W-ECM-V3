@@ -38,10 +38,10 @@ size_t command_parser_relay(char *param, char *out, void *arg)
 {
     if (!param)
     {
-        return sprintf(out, "+RELAY: %d\r\nOK", io_get_relay());
+        return sprintf(out, "+RELAY: %d\r\nOK", io_relay_get_level());
     }
     int param_int = strtoul(param, NULL, 0);
-    io_set_relay((param_int == 1) ? 1 : 0);
+    io_relay_set_level((param_int == 1) ? 1 : 0);
     return sprintf(out, SUCCESS_STR);
 }
 
@@ -123,8 +123,10 @@ size_t command_parser_samsung(char *param, char *out, void *args)
     token[0] = strtok_r(param, ",", &save_ptr);
     token[1] = strtok_r(NULL, ",", &save_ptr);
 
-    if (token[0] && token[1]) {
-        switch (token[0])
+    if (token[0] && token[1])
+    {       
+
+        switch ((uint8_t) token[0])
         {
         case 9:
             samsung_fan_autofan();
@@ -143,33 +145,32 @@ size_t command_parser_samsung(char *param, char *out, void *args)
             break;
 
         case 5:
-            samsung_auto(token[1]);
+            samsung_auto((uint8_t)token[1]);
             break;
 
         case 4:
-            samsung_dry(token[1]);
+            samsung_dry((uint8_t)token[1]);
             break;
 
         case 3:
-            samsung_cool_autofan(token[1]);
+            samsung_cool_autofan((uint8_t)token[1]);
             break;
 
         case 2:
-            samsung_cool_highfan(token[1]);            
+            samsung_cool_highfan((uint8_t)token[1]);
             break;
 
         case 1:
-            samsung_cool_medfan(token[1]);
+            samsung_cool_medfan((uint8_t)token[1]);
             break;
-        
-        case 0:        
-            samsung_cool_lowfan(token[1]);
+
+        case 0:
+            samsung_cool_lowfan((uint8_t)token[1]);
             break;
 
         default:
             return sprintf(out, ERROR_STR);
             break;
-
         }
         return sprintf(out, SUCCESS_STR);
     }
@@ -184,7 +185,7 @@ size_t command_parser_stoggle(char *param, char *out, void *args)
         return sprintf(out, "+STOGGLE:\r\nOK");
     }
 
-    switch (param)
+    switch ((uint8_t)param)
     {
     case 2: //TURBO
         samsung_toggle_turbo();

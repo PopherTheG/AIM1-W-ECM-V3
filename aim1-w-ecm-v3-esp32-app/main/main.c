@@ -295,7 +295,7 @@ static void cloud_cb(cloud_event_t *evt)
         ESP_LOGI(TAG, "MQTT Data received");
         ESP_LOGI(TAG, "Topic=%.*s", evt->evt.data.mqtt.topic_len, evt->evt.data.mqtt.topic);
         ESP_LOGI(TAG, "Data=%.*s", evt->evt.data.mqtt.len, evt->evt.data.mqtt.data);
-        commands_process((char *)evt->data.mqtt.len, evt->data.mqtt.data, remote_command_cloud_response_wrapper);
+        commands_process((char *)evt->evt.data.mqtt.len, evt->evt.data.mqtt.data, remote_command_cloud_response_wrapper);
         break;
 
     default:
