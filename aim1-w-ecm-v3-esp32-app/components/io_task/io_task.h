@@ -47,11 +47,7 @@ void io_ctrl3_set_level(uint8_t level);
 void io_ctrl4_set_level(uint8_t level);
 void io_ledcolor(io_ledcolor_t ledcolor);
 void io_relay_set_level(uint8_t level);
-<<<<<<< HEAD
-uint8_t io_relay_get_level();
-=======
 uint8_t io_relay_get_level(void);
->>>>>>> 353f73eafc608f67e0b2353782e78313de0fed92
 
 
 #if 0

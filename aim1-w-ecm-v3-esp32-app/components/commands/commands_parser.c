@@ -123,15 +123,10 @@ size_t command_parser_samsung(char *param, char *out, void *args)
     token[0] = strtok_r(param, ",", &save_ptr);
     token[1] = strtok_r(NULL, ",", &save_ptr);
 
-<<<<<<< HEAD
-    if (token[0] && token[1]) {
-        switch (*((uint8_t*)token[0]))
-=======
     if (token[0] && token[1])
     {       
 
         switch ((uint8_t) token[0])
->>>>>>> 353f73eafc608f67e0b2353782e78313de0fed92
         {
         case 9:
             samsung_fan_autofan();
