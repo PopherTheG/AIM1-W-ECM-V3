@@ -74,6 +74,15 @@
 #include "telemetry_protocol.h"
 /* end */
 
+/* commands related includes */
+#include "commands.h"
+/* end */
+
+/* OTA related includes */
+#include "ota.h"
+/* end */
+
+
 #define TAG "MAIN.C"
 
 #define I2C1_SDA GPIO_NUM_32
@@ -123,6 +132,7 @@ static void initialize_sntp(void);
 static void sntp_obtain_time(void);
 static void cb_connection_ok(void *pvParamter);
 static void system_info_task(void *pvParameters);
+static void remote_command_cloud_response_wrapper(const char *out, size_t len);
 
 void app_main(void)
 {
@@ -136,6 +146,7 @@ void app_main(void)
 #endif
 
     /* Start task on st7899 display using LVGL library */
+    commands_init();
     gui_start_task();
 
     esp_efuse_mac_get_default(chipId);
@@ -284,6 +295,7 @@ static void cloud_cb(cloud_event_t *evt)
         ESP_LOGI(TAG, "MQTT Data received");
         ESP_LOGI(TAG, "Topic=%.*s", evt->evt.data.mqtt.topic_len, evt->evt.data.mqtt.topic);
         ESP_LOGI(TAG, "Data=%.*s", evt->evt.data.mqtt.len, evt->evt.data.mqtt.data);
+        commands_process((char *)evt->data.mqtt.len, evt->data.mqtt.data, remote_command_cloud_response_wrapper);
         break;
 
     default:
@@ -352,6 +364,11 @@ static void sntp_obtain_time(void)
             vTaskDelay(1000 / portTICK_PERIOD_MS);
         }
     }
+}
+
+static void remote_command_cloud_response_wrapper(const char *out, size_t len) 
+{
+    cloud_api_send_rc_response((uint8_t *)out, len);
 }
 
 static void cb_connection_ok(void *pvParamter)
