@@ -105,11 +105,13 @@ static void tca6416a_task(void *data)
                 {
                     TCA6416AWriteOutputPin(RELAY_SET, 1, TCA6416A_ADDRESS, 0);
                     TCA6416AWriteOutputPin(RELAY_RST, 0, TCA6416A_ADDRESS, 0);
+                    relay_level = 1;
                 }
                 else if (output_evt.level == 0)
                 {
                     TCA6416AWriteOutputPin(RELAY_SET, 0, TCA6416A_ADDRESS, 0);
                     TCA6416AWriteOutputPin(RELAY_RST, 1, TCA6416A_ADDRESS, 0);   
+                    relay_level = 0;
                 }
                 IO_MUTEX_UNLOCK(io_mutex);
                 break;
@@ -392,4 +394,9 @@ void io_relay_set_level(uint8_t level)
         ESP_LOGE(TAG, "Unknown event level (only 0 or 1)");
     }
     xQueueSendToBack(tca6416a_out_queue, &event, pdMS_TO_TICKS(100));
+}
+
+uint8_t io_relay_get_level()
+{
+    return relay_level;
 }

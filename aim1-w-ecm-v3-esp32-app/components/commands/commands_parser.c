@@ -38,10 +38,10 @@ size_t command_parser_relay(char *param, char *out, void *arg)
 {
     if (!param)
     {
-        return sprintf(out, "+RELAY: %d\r\nOK", io_get_relay());
+        return sprintf(out, "+RELAY: %d\r\nOK", io_relay_get_level());
     }
     int param_int = strtoul(param, NULL, 0);
-    io_set_relay((param_int == 1) ? 1 : 0);
+    io_relay_set_level((param_int == 1) ? 1 : 0);
     return sprintf(out, SUCCESS_STR);
 }
 
@@ -124,7 +124,7 @@ size_t command_parser_samsung(char *param, char *out, void *args)
     token[1] = strtok_r(NULL, ",", &save_ptr);
 
     if (token[0] && token[1]) {
-        switch (token[0])
+        switch (*((uint8_t*)token[0]))
         {
         case 9:
             samsung_fan_autofan();
