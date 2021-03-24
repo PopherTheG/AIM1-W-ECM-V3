@@ -21574,10 +21574,7 @@
                                         "help": "Configure the display CS pin here.",
                                         "id": "LV_DISP_SPI_CS",
                                         "name": "LV_DISP_SPI_CS",
-                                        "range": [
-                                            0,
-                                            39
-                                        ],
+                                        "range": null,
                                         "title": "GPIO for CS (Slave Select)",
                                         "type": "int"
                                     }

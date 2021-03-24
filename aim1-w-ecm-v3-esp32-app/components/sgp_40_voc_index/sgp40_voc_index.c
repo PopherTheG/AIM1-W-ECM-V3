@@ -33,7 +33,6 @@
 #include "sensirion_config.h"
 #include "sensirion_voc_algorithm.h"
 #include "sgp40.h"
-// #include "sht4x.h"
 #include "sht4x.h"
 
 #ifdef __cplusplus

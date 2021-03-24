@@ -47,7 +47,13 @@
     "nvs_flash.h": "c",
     "esp_partition.h": "c",
     "cloud_config_default.h": "c",
-    "telemetry_encoder.h": "c"
+    "telemetry_encoder.h": "c",
+    "sgp40_voc_index_task.h": "c",
+    "telemetry_protocol.h": "c",
+    "sgp40_voc_index.h": "c",
+    "stdint.h": "c",
+    "thread": "c",
+    "telemetry.h": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled"
 }

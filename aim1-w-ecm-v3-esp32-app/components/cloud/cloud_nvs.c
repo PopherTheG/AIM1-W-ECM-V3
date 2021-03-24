@@ -11,7 +11,7 @@
 
 void cloud_nvs_get(cloud_config_t* config) {
     esp_err_t err;
-    nvs_handle_t handle;
+    nvs_handle handle;
     size_t str_len = sizeof(config->host) - 1;
     
     err = nvs_open_from_partition(NVS_PARTITION, NVS_PARTITION_NAMESPACE, NVS_READONLY, &handle);
@@ -31,7 +31,7 @@ void cloud_nvs_get(cloud_config_t* config) {
 
 void cloud_nvs_set_host(const char* host) {
     esp_err_t err;
-    nvs_handle_t handle;
+    nvs_handle handle;
     
     err = nvs_open_from_partition(NVS_PARTITION, NVS_PARTITION_NAMESPACE, NVS_READWRITE, &handle);
     ESP_ERROR_CHECK_WITHOUT_ABORT(err);
@@ -45,7 +45,7 @@ void cloud_nvs_set_host(const char* host) {
 
 void cloud_nvs_set_port(uint16_t port) {
     esp_err_t err;
-    nvs_handle_t handle;
+    nvs_handle handle;
     
     err = nvs_open_from_partition(NVS_PARTITION, NVS_PARTITION_NAMESPACE, NVS_READWRITE, &handle);
     ESP_ERROR_CHECK_WITHOUT_ABORT(err);
@@ -59,7 +59,7 @@ void cloud_nvs_set_port(uint16_t port) {
 
 void cloud_nvs_set_conntype(uint8_t conntype) {
     esp_err_t err;
-    nvs_handle_t handle;
+    nvs_handle handle;
     
     err = nvs_open_from_partition(NVS_PARTITION, NVS_PARTITION_NAMESPACE, NVS_READWRITE, &handle);
     ESP_ERROR_CHECK_WITHOUT_ABORT(err);

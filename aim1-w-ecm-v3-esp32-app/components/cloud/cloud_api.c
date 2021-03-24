@@ -6,10 +6,11 @@
 #include "cloud_mqtt.h"
 #include "cloud_config_default.h"
 #include "cloud_nvs.h"
+#include "esp_log.h"
 
 static cloud_app_cb app_layer_cb;
 static cloud_tcp_handle_t tcp_handle;
-static cloud_config_t config = {0};
+static cloud_config_t cloud_config = {0};
 
 static char mqtt_main_topic[32] = CLOUD_CFG_MQTT_TOPIC_MAIN;
 static char mqtt_rc_topic_rx[256]; /*!< Receiver topic */
@@ -18,9 +19,9 @@ static char mqtt_rc_topic_tx[256];
 void cloud_api_init(cloud_app_cb app_cb)
 {
     app_layer_cb = app_layer_cb;
-    cloud_nvs_get(&config);    
+    cloud_nvs_get(&cloud_config);    
 
-    if (config.conntype == CLOUD_TYPE_MQTT)
+    if (cloud_config.conntype == CLOUD_TYPE_MQTT)
     {
         cloud_mqtt_init(app_cb);
     }
@@ -32,34 +33,34 @@ void cloud_api_init(cloud_app_cb app_cb)
 
 void cloud_api_deinit(void)
 {
-    if (config.conntype == CLOUD_TYPE_MQTT)
+    if (cloud_config.conntype == CLOUD_TYPE_MQTT)
     {
         cloud_mqtt_deinit();
     }
-    else if (config.conntype == CLOUD_TYPE_TCP)
+    else if (cloud_config.conntype == CLOUD_TYPE_TCP)
     {
         cloud_tcp_deinit(tcp_handle);
     }
 }
 
 cloud_ret_t cloud_api_connect(void) {
-    return cloud_api_connect_host(config.host, config.port);
+    return cloud_api_connect_host(cloud_config.host, cloud_config.port);
 }
 
 cloud_ret_t cloud_api_connect_host(const char* dst, uint16_t port)
 {
-
+    ESP_LOGI("CLOUD", "HOST %s", dst);
     cloud_ret_t err = CLOUD_RET_UNKNOWN_PROTOCOL;
     assert(dst != NULL);
 
-    if ((config.conntype == CLOUD_TYPE_MQTT) || (config.conntype == CLOUD_TYPE_MQTTS))
+    if ((cloud_config.conntype == CLOUD_TYPE_MQTT) || (cloud_config.conntype == CLOUD_TYPE_MQTTS))
     {
         if (cloud_mqtt_connect(dst, port))
         {
             err = CLOUD_RET_OK;
         }
     }
-    else if (config.conntype == CLOUD_TYPE_TCP)
+    else if (cloud_config.conntype == CLOUD_TYPE_TCP)
     {
         if (!(cloud_tcp_connect(tcp_handle, dst, port) < 0))
         {
@@ -74,14 +75,14 @@ cloud_ret_t cloud_api_disconnect(void)
 {
     cloud_ret_t err = CLOUD_RET_ERR;
 
-    if ((config.conntype == CLOUD_TYPE_MQTT) || (config.conntype == CLOUD_TYPE_MQTTS))
+    if ((cloud_config.conntype == CLOUD_TYPE_MQTT) || (cloud_config.conntype == CLOUD_TYPE_MQTTS))
     {
         if (cloud_mqtt_disconnect())
         {
             err = CLOUD_RET_OK;
         }
     }
-    else if (config.conntype == CLOUD_TYPE_TCP)
+    else if (cloud_config.conntype == CLOUD_TYPE_TCP)
     {
         cloud_tcp_disconnect(tcp_handle);
         err = CLOUD_RET_OK;
@@ -95,14 +96,14 @@ cloud_ret_t cloud_api_send(const uint8_t *data, size_t len)
     cloud_ret_t err = CLOUD_RET_ERR;
     assert(data != NULL);
 
-    if (strlen(mqtt_main_topic) && ((config.conntype == CLOUD_TYPE_MQTT) || (config.conntype == CLOUD_TYPE_MQTTS)))
+    if (strlen(mqtt_main_topic) && ((cloud_config.conntype == CLOUD_TYPE_MQTT) || (cloud_config.conntype == CLOUD_TYPE_MQTTS)))
     {
         if (cloud_mqtt_publish(mqtt_main_topic, data, len, 2))
         {
             err = CLOUD_RET_OK;
         }
     }
-    else if (config.conntype == CLOUD_TYPE_TCP)
+    else if (cloud_config.conntype == CLOUD_TYPE_TCP)
     {
         cloud_tcp_send(tcp_handle, data, len);
     }
@@ -153,17 +154,31 @@ cloud_ret_t cloud_api_send_rc_response(const uint8_t *data, size_t len)
 {
     cloud_ret_t err = CLOUD_RET_ERR;
 
-    if ((config.conntype == CLOUD_TYPE_MQTT) || (config.conntype == CLOUD_TYPE_MQTTS))
+    if ((cloud_config.conntype == CLOUD_TYPE_MQTT) || (cloud_config.conntype == CLOUD_TYPE_MQTTS))
     {
         if (cloud_mqtt_publish(mqtt_rc_topic_tx, data, len, 2))
         {
             err = CLOUD_RET_OK;
         }
     }
-    else if (config.conntype == CLOUD_TYPE_TCP)
+    else if (cloud_config.conntype == CLOUD_TYPE_TCP)
     {
         cloud_tcp_send(tcp_handle, data, len);
     }
 
     return err;
+}
+
+void cloud_api_get_config(cloud_config_t* config) {
+    *config = cloud_config;
+}
+
+void cloud_api_set_config(const cloud_config_t* config) {
+    if(cloud_config.conntype == CLOUD_TYPE_MQTT) {
+        cloud_mqtt_disconnect();
+    }
+    cloud_config = *config;
+    cloud_nvs_set_host(cloud_config.host);
+    cloud_nvs_set_port(cloud_config.port);
+    cloud_nvs_set_conntype(cloud_config.conntype);
 }

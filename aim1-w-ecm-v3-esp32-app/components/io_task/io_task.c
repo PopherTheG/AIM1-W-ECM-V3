@@ -31,6 +31,13 @@
 #define RELAY_SET TCA6416A_P05 /* MAIN */
 #define RELAY_RST TCA6416A_P06 /* MAIN */
 
+static void tca6416a_task(void *data);
+static void init_main_expander(void);
+static void init_secondary_expander(void);
+static void io_redled_set_level(uint8_t level);
+static void io_blueled_set_level(uint8_t level);
+static void io_greenled_set_level(uint8_t level);
+
 static SemaphoreHandle_t io_mutex;
 static SemaphoreHandle_t io_semaphore;
 static QueueHandle_t tca6416a_out_queue;
@@ -74,20 +81,23 @@ static void tca6416a_task(void *data)
                 IO_MUTEX_UNLOCK(io_mutex);
                 break;
             case TCA6416A_LED_RED:
-                ESP_LOGI(TAG, "RED LED status: %d", output_evt.level);
+                // ESP_LOGI(TAG, "RED LED status: %d", output_evt.level);
                 IO_MUTEX_LOCK(io_mutex);
                 TCA6416AWriteOutputPin(LED_RED, output_evt.level, TCA6416A_ADDRESS_EXPND, 1);
                 IO_MUTEX_UNLOCK(io_mutex);
+                break;
             case TCA6416A_LED_BLUE:
-                ESP_LOGI(TAG, "BLUE LED status: %d", output_evt.level);
+                // ESP_LOGI(TAG, "BLUE LED status: %d", output_evt.level);
                 IO_MUTEX_LOCK(io_mutex);
                 TCA6416AWriteOutputPin(LED_BLUE, output_evt.level, TCA6416A_ADDRESS_EXPND, 1);
                 IO_MUTEX_UNLOCK(io_mutex);
+                break;
             case TCA6416A_LED_GREEN:
-                ESP_LOGI(TAG, "GREEN LED status: %d", output_evt.level);
+                // ESP_LOGI(TAG, "GREEN LED status: %d", output_evt.level);
                 IO_MUTEX_LOCK(io_mutex);
                 TCA6416AWriteOutputPin(LED_GREEN, output_evt.level, TCA6416A_ADDRESS_EXPND, 1);
                 IO_MUTEX_UNLOCK(io_mutex);
+                break;
             case TCA6416A_RELAY:
                 ESP_LOGI(TAG, "RELAY status: %d", output_evt.level);
                 IO_MUTEX_LOCK(io_mutex);
@@ -102,6 +112,7 @@ static void tca6416a_task(void *data)
                     TCA6416AWriteOutputPin(RELAY_RST, 1, TCA6416A_ADDRESS, 0);   
                 }
                 IO_MUTEX_UNLOCK(io_mutex);
+                break;
             default:
                 break;
             }
@@ -144,9 +155,9 @@ static void init_secondary_expander(void)
     regs.Config.Port.P1.bit.B6 = TCA6416A_CONFIG_OUTPUT; /* CTRL4 LED */
 
     /* Initial output*/
-    regs.Output.Port.P0.bit.B0 = LOW; /* RED LED note: active low device */
-    regs.Output.Port.P0.bit.B1 = LOW; /* GREEN LED note: active low device */
-    regs.Output.Port.P0.bit.B2 = LOW; /* BLUE LED note: active low device */
+    regs.Output.Port.P0.bit.B0 = HIGH; /* RED LED note: active low device */
+    regs.Output.Port.P0.bit.B1 = HIGH; /* GREEN LED note: active low device */
+    regs.Output.Port.P0.bit.B2 = HIGH; /* BLUE LED note: active low device */
     regs.Output.Port.P1.bit.B4 = LOW; /* CTRL1 LED */
     regs.Output.Port.P1.bit.B5 = LOW; /* CTRL2 LED */
     regs.Output.Port.P1.bit.B7 = LOW; /* CTRL3 LED */
@@ -251,7 +262,7 @@ void io_ctrl4_set_level(uint8_t level)
     xQueueSendToBack(tca6416a_out_queue, &event, pdMS_TO_TICKS(100));
 }
 
-void io_redled_set_level(uint8_t level)
+static void io_redled_set_level(uint8_t level)
 {
     output_event_t event = {0};
 
@@ -271,8 +282,7 @@ void io_redled_set_level(uint8_t level)
 
     xQueueSendToBack(tca6416a_out_queue, &event, pdMS_TO_TICKS(100));
 }
-
-void io_blueled_set_level(uint8_t level)
+static void io_blueled_set_level(uint8_t level)
 {
     output_event_t event = {0};
 
@@ -292,8 +302,7 @@ void io_blueled_set_level(uint8_t level)
 
     xQueueSendToBack(tca6416a_out_queue, &event, pdMS_TO_TICKS(100));
 }
-
-void io_greenled_set_level(uint8_t level)
+static void io_greenled_set_level(uint8_t level)
 {
     output_event_t event = {0};
 
@@ -312,6 +321,57 @@ void io_greenled_set_level(uint8_t level)
     }
 
     xQueueSendToBack(tca6416a_out_queue, &event, pdMS_TO_TICKS(100));
+}
+
+void io_ledcolor(io_ledcolor_t ledcolor)
+{
+    switch (ledcolor)
+    {
+    case LED_COLOR_BLUE:
+        io_blueled_set_level(1);
+        io_redled_set_level(0);
+        io_greenled_set_level(0);
+        ESP_LOGI(TAG, "LED_COLOR_BLUE");
+        break;
+    case LED_COLOR_RED:
+        io_blueled_set_level(0);
+        io_redled_set_level(1);
+        io_greenled_set_level(0);
+        ESP_LOGI(TAG, "LED_COLOR_RED");
+        break;
+    case LED_COLOR_GREEN:
+        io_blueled_set_level(0);
+        io_redled_set_level(0);
+        io_greenled_set_level(1);
+        ESP_LOGI(TAG, "LED_COLOR_GREEN");
+        break;
+    case LED_COLOR_MAGENTA:
+        io_blueled_set_level(1);
+        io_redled_set_level(1);
+        io_greenled_set_level(0);
+        ESP_LOGI(TAG, "LED_COLOR_MAGENTA");
+        break;
+    case LED_COLOR_CYAN:
+        io_blueled_set_level(1);
+        io_redled_set_level(0);
+        io_greenled_set_level(1);
+        ESP_LOGI(TAG, "LED_COLOR_CYAN");
+        break;
+    case LED_COLOR_YELLOW:
+        io_blueled_set_level(0);
+        io_redled_set_level(1);
+        io_greenled_set_level(1);
+        ESP_LOGI(TAG, "LED_COLOR_YELLOW");
+        break;
+    case LED_COLOR_WHITE:
+        io_blueled_set_level(1);
+        io_redled_set_level(1);
+        io_greenled_set_level(1);
+        ESP_LOGI(TAG, "LED_COLOR_WHITE");
+        break;
+    default:
+        break;
+    }
 }
 
 void io_relay_set_level(uint8_t level)

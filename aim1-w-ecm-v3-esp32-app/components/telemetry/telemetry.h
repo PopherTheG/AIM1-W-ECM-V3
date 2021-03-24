@@ -3,17 +3,17 @@
 
 #include <stdint.h>
 
-typedef enum
-{
+typedef enum {
     TELEMETRY_ERR = -1,
     TELEMETRY_OK = 0,
-} telemetry_err_t;
+}telemetry_err_t;
 
-typedef enum
-{
-    TELEMETRY_ERR = -1,
-    TELEMETRY_OK = 0,
-} telemetry_err_t;
+typedef enum {
+    TELEMETRY_TASK_STOP = -1,
+    TELEMETRY_TASK_LOG,
+    TELEMETRY_SENSOR,
+    TELEMETRY_AIRQLTY
+} telemetry_msg_id_t;
 
 typedef struct
 {
@@ -23,16 +23,14 @@ typedef struct
 
 void telemetry_init(void);
 
+void telemetry_airparameters_timer_start(void);
+void telemetry_airparameters_timer_stop(void);
+
+void telemetry_sgp40sht4x_timer_start(void);
+void telemetry_sgp40sht4x_timer_stop(void);
 void telemetry_deinit(void);
-
-void telemetry_start(uint64_t* id);
-
+void telemetry_start(uint64_t *id);
 void telemetry_stop(void);
-
-void telemetry_svm40_timer_start(void);
-
-void telemetry_svm40_timer_stop(void);
-
 telemetry_err_t telemetry_notify_log(uint8_t device_type);
 
 #endif /* COMPONENTS_TELEMETRY_TELEMETRY */

@@ -28,11 +28,13 @@
 #include "esp_sntp.h"
 #include "esp_attr.h"
 #include "esp_event.h"
+#include "esp_heap_caps.h"
 /* end */
 
 /* WiFi related includes */
 #include "wifi_manager.h"
 #include "cloud_api.h"
+#include "cloud_nvs.h"
 /* end */
 
 /* Sensirion related includes */
@@ -65,6 +67,11 @@
 
 /* io expander related includes */
 #include "io_task.h"
+/* end */
+
+/* telemetry related includes */
+#include "telemetry.h"
+#include "telemetry_protocol.h"
 /* end */
 
 #define TAG "MAIN.C"
@@ -115,19 +122,18 @@ static void time_sync_notification_cb(struct timeval *tv);
 static void initialize_sntp(void);
 static void sntp_obtain_time(void);
 static void cb_connection_ok(void *pvParamter);
+static void system_info_task(void *pvParameters);
 
 void app_main(void)
 {
+    ESP_LOGI(TAG, "Start!");
     system_init();
+    io_init();
 
 #ifdef SPS30_INSTALLED
     /* Start task on sps30 to get pm2.5 and pm10 data */
     // sps30_start_task();
 #endif
-    /* Start task on getting VOC index, temperature and humidity */
-    /* this task must be called right after the initialization of the I2C
-    Not doing so will affect the probing of SHT4x ( call this before wifi manager ) */
-    sgp40_voc_index_start_task();
 
     /* Start task on st7899 display using LVGL library */
     gui_start_task();
@@ -143,6 +149,18 @@ void app_main(void)
     /* Once internet connection is established. Connect to the cloud
     with the callback cb_connection_ok */
     wifi_manager_set_callback(WM_EVENT_STA_GOT_IP, &cb_connection_ok);
+
+    /* Initializes the Queue for telemetry related events */
+    telemetry_init();
+
+    uint64_t id = strtoull(serial, NULL, 0);
+    /* starts the telemetry task of sending data to cloud with the specific ID of the esp32 */
+    telemetry_start(&id);
+
+    /* Start task on getting VOC index, temperature and humidity */
+    /* this task must be called right after the initialization of the I2C
+    Not doing so will affect the probing of SHT4x ( call this before wifi manager ) */
+    sgp40_voc_index_start_task();
 
     /* Create and start task to run a test on actuating the samsung airconditioner */
     // xTaskCreate(run_all_samsung_test, "samsung ac test", 1024 * 2, NULL, 2, NULL);
@@ -163,13 +181,27 @@ static void system_init(void)
     setenv("TZ", "PST-8", 1);
     tzset();
 
-    // rmt_tx_init(); /* initialize ir peripheral of esp32 */
+    rmt_tx_init(); /* initialize ir peripheral of esp32 */
     i2c_initialize(I2C_MODE_MASTER, I2C1_SDA, I2C1_SCL, true, true, 100000, I2C_NUM_0);
     i2c_initialize(I2C_MODE_MASTER, I2C2_SDA, I2C2_SCL, true, true, 100000, I2C_NUM_1); /* Slaves connected: SGP40, SHT4X, IO Expander on DEX*/
-    io_init();
-    io_redled_set_level(0);
-    io_blueled_set_level(0);
-    io_greenled_set_level(0);
+}
+
+static void system_info_task(void *pvParameters)
+{
+    (void)pvParameters;
+    TickType_t last_wake_time = xTaskGetTickCount();
+
+    while (1)
+    {
+        vTaskDelayUntil(&last_wake_time, pdMS_TO_TICKS(30000));
+        uint32_t iram_free = heap_caps_get_free_size(MALLOC_CAP_32BIT);
+        uint32_t uptime = esp_timer_get_time() / 1000000;
+
+        display_time();
+
+        ESP_LOGI(TAG, "RAM32: %u Uptime: %u seconds", iram_free, uptime);
+    }
+    vTaskDelete(NULL);
 }
 
 /**
@@ -262,11 +294,10 @@ static void cloud_cb(cloud_event_t *evt)
 
 static void connect_to_cloud(void)
 {
-    cloud_ret_t cloud_ret = cloud_api_connect();
+    // cloud_ret_t cloud_ret = cloud_api_connect_host(HOST, PORT);
     cloud_api_init(cloud_cb);
     cloud_api_set_mqtt_id(serial);
-
-    // cloud_ret_t cloud_ret = cloud_api_connect_host(HOST, PORT);
+    cloud_ret_t cloud_ret = cloud_api_connect();
 
     if (cloud_ret == CLOUD_RET_OK)
     {
@@ -334,4 +365,12 @@ static void cb_connection_ok(void *pvParamter)
 
     connect_to_cloud();
     sntp_obtain_time();
+
+    // const cloud_config_t cloud_config = {
+    // .conntype = CLOUD_TYPE_MQTT,
+    // .host = "52.221.96.155",
+    // .port = 2883
+    // };
+
+    // cloud_api_set_config(&cloud_config);
 }

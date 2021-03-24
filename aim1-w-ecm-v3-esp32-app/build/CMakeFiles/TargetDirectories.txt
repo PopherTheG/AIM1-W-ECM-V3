@@ -678,6 +678,13 @@ D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/sensirion
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/sensirion-embedded-common/CMakeFiles/rebuild_cache.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/sensirion-embedded-common/CMakeFiles/list_install_components.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/sensirion-embedded-common/CMakeFiles/install/strip.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/telemetry/CMakeFiles/install/local.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/telemetry/CMakeFiles/install.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/telemetry/CMakeFiles/edit_cache.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/telemetry/CMakeFiles/__idf_telemetry.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/telemetry/CMakeFiles/rebuild_cache.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/telemetry/CMakeFiles/list_install_components.dir
+D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/telemetry/CMakeFiles/install/strip.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/sgp_40_voc_index/CMakeFiles/__idf_sgp_40_voc_index.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/sgp_40_voc_index/CMakeFiles/install/local.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/sgp_40_voc_index/CMakeFiles/install.dir
@@ -685,13 +692,6 @@ D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/sgp_40_vo
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/sgp_40_voc_index/CMakeFiles/rebuild_cache.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/sgp_40_voc_index/CMakeFiles/list_install_components.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/sgp_40_voc_index/CMakeFiles/install/strip.dir
-D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/smart_wifi/CMakeFiles/__idf_smart_wifi.dir
-D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/smart_wifi/CMakeFiles/install/local.dir
-D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/smart_wifi/CMakeFiles/install.dir
-D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/smart_wifi/CMakeFiles/edit_cache.dir
-D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/smart_wifi/CMakeFiles/rebuild_cache.dir
-D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/smart_wifi/CMakeFiles/list_install_components.dir
-D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/smart_wifi/CMakeFiles/install/strip.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/sps30/CMakeFiles/__idf_sps30.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/sps30/CMakeFiles/install/local.dir
 D:/Xeleqt-Projects/AIM1-W-ECM-V3/aim1-w-ecm-v3-esp32-app/build/esp-idf/sps30/CMakeFiles/install.dir

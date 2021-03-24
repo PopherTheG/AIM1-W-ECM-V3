@@ -28,17 +28,24 @@ typedef struct
     uint8_t level;
 } output_event_t;
 
+typedef enum
+{
+    LED_COLOR_BLUE,
+    LED_COLOR_RED,
+    LED_COLOR_GREEN,
+    LED_COLOR_MAGENTA, /* BLUE + RED */
+    LED_COLOR_CYAN,    /* BLUE + GREEN */
+    LED_COLOR_YELLOW,  /* RED + GREEN */
+    LED_COLOR_WHITE,   /* BLUE + RED + GREEN */
+} io_ledcolor_t;
+
 void io_init(void);
 
 void io_ctrl1_set_level(uint8_t level);
 void io_ctrl2_set_level(uint8_t level);
 void io_ctrl3_set_level(uint8_t level);
 void io_ctrl4_set_level(uint8_t level);
-
-void io_redled_set_level(uint8_t level);
-void io_blueled_set_level(uint8_t level);
-void io_greenled_set_level(uint8_t level);
-
+void io_ledcolor(io_ledcolor_t ledcolor);
 void io_relay_set_level(uint8_t level);
 
 
