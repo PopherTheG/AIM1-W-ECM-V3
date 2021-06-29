@@ -59,7 +59,6 @@ static void sgp40_voc_index_task(void *arg)
         err = sensirion_measure_voc_index_with_rh_t(&voc_index, &relative_humidity_percent, &temperature_celsius); /* int32 int32 int32 */
         if (err == STATUS_OK)
         {
-            data_ready = 1;
             cur_data.relative_humidity = relative_humidity_percent;
             cur_data.temperature = temperature_celsius;
             cur_data.voc_index = voc_index;
@@ -67,6 +66,7 @@ static void sgp40_voc_index_task(void *arg)
             printf("Temerature: %.04fdegC\n", temperature_celsius * 0.001f);
             printf("Relative Humidity: %.03f%%RH\n",
                    relative_humidity_percent * 0.001f);
+            data_ready = 1;
             SGP40_VOC = voc_index; /* For GUI purposes */
             SHT4X_TEMP = temperature_celsius * 0.001f; /* For GUI purposes */
             SHT4X_HUM = relative_humidity_percent * 0.001f; /* For GUI purposes */

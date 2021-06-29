@@ -35,3 +35,30 @@ Relative Humidity: 53.076%RH
 93 6f                       (DEC = 28563)
 54 cf                       (DEC = 53076)
 2c eb
+
+
+typedef struct 
+{
+    uint8_t type;
+    uint8_t device_type;
+    uint64_t serial;
+    uint32_t timestamp;
+    int16_t voc_index;
+    int16_t temperature;
+    int16_t humidity;
+    int16_t pm2_5;
+    int16_t pm10;
+    int16_t co2;
+} __attribute__((packed)) telemetry_sgp40_sht4x_t;
+
+03 
+05
+1c 80 51 60 b1 24 3d 00 
+25 c2 60 60 
+00 00 
+7f 6b 
+ce c0 
+00 00 
+00 00 
+00 00 
+a5 15

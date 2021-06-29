@@ -37,4 +37,5 @@ typedef struct
 void sgp40_voc_index_start_task();
 
 void sgp40_sht4x_get_data(sgp40_sht4x_sensor_t *data);
+
 #endif

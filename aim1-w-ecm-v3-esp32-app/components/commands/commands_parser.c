@@ -15,9 +15,13 @@
 #include "io_task.h"
 #include "irtransmitter.h"
 
+
+
 #define SUCCESS_STR "OK"
 #define ERROR_STR "ERROR"
 #define MAX_SCAN_LIST 10
+
+#define TAG "commands_parser.c"
 
 typedef struct
 {
@@ -42,6 +46,14 @@ size_t command_parser_relay(char *param, char *out, void *arg)
     }
     int param_int = strtoul(param, NULL, 0);
     io_relay_set_level((param_int == 1) ? 1 : 0);
+    if (io_relay_get_level() == 0)
+    {
+        io_ledcolor(LED_COLOR_RED);
+    }
+    else if (io_relay_get_level() == 1)
+    {
+        io_ledcolor(LED_COLOR_GREEN);
+    }
     return sprintf(out, SUCCESS_STR);
 }
 
@@ -126,7 +138,7 @@ size_t command_parser_samsung(char *param, char *out, void *args)
     if (token[0] && token[1])
     {       
 
-        switch ((uint8_t) token[0])
+        switch (atoi(token[0]))
         {
         case 9:
             samsung_fan_autofan();
@@ -145,27 +157,27 @@ size_t command_parser_samsung(char *param, char *out, void *args)
             break;
 
         case 5:
-            samsung_auto((uint8_t)token[1]);
+            samsung_auto(atoi(token[1]));
             break;
 
         case 4:
-            samsung_dry((uint8_t)token[1]);
+            samsung_dry(atoi(token[1]));
             break;
 
         case 3:
-            samsung_cool_autofan((uint8_t)token[1]);
+            samsung_cool_autofan(atoi(token[1]));
             break;
 
         case 2:
-            samsung_cool_highfan((uint8_t)token[1]);
+            samsung_cool_highfan(atoi(token[1]));
             break;
 
         case 1:
-            samsung_cool_medfan((uint8_t)token[1]);
+            samsung_cool_medfan(atoi(token[1]));
             break;
 
         case 0:
-            samsung_cool_lowfan((uint8_t)token[1]);
+            samsung_cool_lowfan(atoi(token[1]));
             break;
 
         default:
@@ -185,7 +197,7 @@ size_t command_parser_stoggle(char *param, char *out, void *args)
         return sprintf(out, "+STOGGLE:\r\nOK");
     }
 
-    switch ((uint8_t)param)
+    switch (atoi(param))
     {
     case 2: //TURBO
         samsung_toggle_turbo();
@@ -198,9 +210,9 @@ size_t command_parser_stoggle(char *param, char *out, void *args)
         break;
 
     case 0:
-    default:
         samsung_toggle_air_direction();
         return sprintf(out, SUCCESS_STR);
+    default:
         break;
     }
 
@@ -216,4 +228,9 @@ size_t command_parser_soff(char *param, char *out, void *args)
     samsung_off();
 
     return sprintf(out, SUCCESS_STR);
+}
+
+size_t command_parser_ctrl(char* param, char* out, void* args)
+{
+    return sprintf(out, ERROR_STR);
 }

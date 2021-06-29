@@ -4,7 +4,7 @@ file(GLOB SOURCES *.c)
 
 idf_component_register(SRCS ${SOURCES}
                        INCLUDE_DIRS .
-                       REQUIRES lvgl)
+                       REQUIRES lvgl io_task TCA6416A)
 
 endif()
 

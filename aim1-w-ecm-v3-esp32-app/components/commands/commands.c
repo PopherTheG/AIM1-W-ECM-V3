@@ -46,7 +46,7 @@ static uint8_t compare_sha256(const char *password)
 
 static size_t process_command(char* in, char* out) 
 {
-     commands_err_t err = COMMANDS_FAIL;
+    commands_err_t err = COMMANDS_FAIL;
     size_t len = 0;
     uint8_t param_start = 0;
     uint8_t cmd_start_pos = 2;
@@ -121,11 +121,11 @@ static void commands_task(void* data){
         command_evt_t* event;
         if(xQueueReceive(command_queue, &event, portMAX_DELAY) == pdPASS) {
             size_t len = process_command((char*) event->buffer, response_buffer);
-
+    
             if(event->response_callback && len) {
                 event->response_callback(response_buffer, len);
             }
-
+    
             free(event);
         }
     }

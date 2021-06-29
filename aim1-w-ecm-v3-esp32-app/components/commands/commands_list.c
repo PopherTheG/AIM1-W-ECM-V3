@@ -74,6 +74,7 @@ void commands_list_init(void)
     at_add_to_db("+SAMSUNG", command_parser_samsung );
     at_add_to_db("+STOGGLE", command_parser_stoggle);
     at_add_to_db("+SOFF", command_parser_soff);
+    at_add_to_db("+CTRL", command_parser_ctrl);
 }
 
 commands_parser_cb commands_list_search(const char *command)

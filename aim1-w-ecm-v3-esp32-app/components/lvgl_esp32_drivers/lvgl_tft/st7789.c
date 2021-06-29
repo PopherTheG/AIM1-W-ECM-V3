@@ -15,6 +15,8 @@
 #include "disp_spi.h"
 #include "driver/gpio.h"
 
+#include "io_task.h"
+
 /*********************
  *      DEFINES
  *********************/
@@ -87,11 +89,11 @@ void st7789_init(void)
         {0, {0}, 0xff},
     };
 
-    //Initialize non-SPI GPIOs
+    // Initialize non-SPI GPIOs
     gpio_pad_select_gpio(ST7789_DC);
     gpio_set_direction(ST7789_DC, GPIO_MODE_OUTPUT);
-    gpio_pad_select_gpio(ST7789_RST);
-    gpio_set_direction(ST7789_RST, GPIO_MODE_OUTPUT);
+    // gpio_pad_select_gpio(ST7789_RST);
+    // gpio_set_direction(ST7789_RST, GPIO_MODE_OUTPUT);
 
 #if ST7789_ENABLE_BACKLIGHT_CONTROL
     gpio_pad_select_gpio(ST7789_BCKL);
@@ -99,9 +101,11 @@ void st7789_init(void)
 #endif
 
     //Reset the display
-    gpio_set_level(ST7789_RST, 0);
+    // gpio_set_level(ST7789_RST, 0);
+    io_st7789rst_set_level(0);
     vTaskDelay(100 / portTICK_RATE_MS);
-    gpio_set_level(ST7789_RST, 1);
+    // gpio_set_level(ST7789_RST, 1);
+    io_st7789rst_set_level(1);
     vTaskDelay(100 / portTICK_RATE_MS);
 
     printf("ST7789 initialization.\n");
@@ -198,6 +202,7 @@ static void st7789_send_cmd(uint8_t cmd)
 {
     disp_wait_for_pending_transactions();
     gpio_set_level(ST7789_DC, 0);
+    // io_st7789dc_set_level(0);
     disp_spi_send_data(&cmd, 1);
 }
 
@@ -205,6 +210,7 @@ static void st7789_send_data(void * data, uint16_t length)
 {
     disp_wait_for_pending_transactions();
     gpio_set_level(ST7789_DC, 1);
+    // io_st7789dc_set_level(1);
     disp_spi_send_data(data, length);
 }
 
@@ -212,6 +218,7 @@ static void st7789_send_color(void * data, uint16_t length)
 {
     disp_wait_for_pending_transactions();
     gpio_set_level(ST7789_DC, 1);
+    // io_st7789dc_set_level(1);
     disp_spi_send_colors(data, length);
 }
 

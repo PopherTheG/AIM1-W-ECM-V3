@@ -54,7 +54,9 @@
     "stdint.h": "c",
     "thread": "c",
     "telemetry.h": "c",
-    "irtransmitter.h": "c"
+    "irtransmitter.h": "c",
+    "freertos.h": "c",
+    "lvgl_spi_conf.h": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled"
 }

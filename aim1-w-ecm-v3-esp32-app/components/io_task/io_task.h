@@ -19,7 +19,14 @@ typedef enum
     TCA6416A_LED_BLUE,
     TCA6416A_LED_RED,
     TCA6416A_LED_GREEN,
-    TCA6416A_RELAY
+    TCA6416A_RELAY,
+
+    BUZZER_PASS,
+    BUZZER_FAIL,
+
+    ST7789_RST_EVT,
+    ST7789_DC_EVT,
+    ST7789_BCKLGHT_EVT
 } output_event_id_t;
 
 typedef struct
@@ -30,6 +37,7 @@ typedef struct
 
 typedef enum
 {
+    LED_COLOR_NONE,
     LED_COLOR_BLUE,
     LED_COLOR_RED,
     LED_COLOR_GREEN,
@@ -39,15 +47,27 @@ typedef enum
     LED_COLOR_WHITE,   /* BLUE + RED + GREEN */
 } io_ledcolor_t;
 
+
 void io_init(void);
 
 void io_ctrl1_set_level(uint8_t level);
 void io_ctrl2_set_level(uint8_t level);
 void io_ctrl3_set_level(uint8_t level);
 void io_ctrl4_set_level(uint8_t level);
+uint8_t io_ctrl1_get_level();
+uint8_t io_ctrl2_get_level();
+uint8_t io_ctrl3_get_level();
+uint8_t io_ctrl4_get_level();
+
 void io_ledcolor(io_ledcolor_t ledcolor);
 void io_relay_set_level(uint8_t level);
 uint8_t io_relay_get_level(void);
+
+void io_st7789rst_set_level(uint8_t level);
+void io_st7789dc_set_level(uint8_t level);
+void io_st7789bcklght_set_level(uint8_t level);
+
+void io_buzzer(uint8_t state);
 
 
 #if 0

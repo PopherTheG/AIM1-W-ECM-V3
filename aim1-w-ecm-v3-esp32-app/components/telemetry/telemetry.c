@@ -147,7 +147,8 @@ void telemetry_init(void)
     xTelemetryQueue = xQueueCreate(TELEMETRY_QUEUE_LEN, sizeof(telemtery_msg_t));
     configASSERT(xTelemetryQueue);
 
-    xSgp40sht4xTimer = xTimerCreate("sgp40 sht4x timer", pdMS_TO_TICKS(10 * 1000), pdTRUE, NULL, vSgp40sht4xTimerCallback);
+    /* TODO:  */
+    xSgp40sht4xTimer = xTimerCreate("sgp40 sht4x timer", pdMS_TO_TICKS(30 * 1000), pdTRUE, NULL, vSgp40sht4xTimerCallback);
     configASSERT(xSgp40sht4xTimer != NULL);
 }
 

@@ -8,6 +8,8 @@
 #include "cloud_nvs.h"
 #include "esp_log.h"
 
+#define TAG "cloud-api"
+
 static cloud_app_cb app_layer_cb;
 static cloud_tcp_handle_t tcp_handle;
 static cloud_config_t cloud_config = {0};
@@ -128,6 +130,8 @@ cloud_ret_t cloud_api_set_mqtt_id(const char *id)
 
     sprintf(mqtt_rc_topic_rx, CLOUD_CFG_MQTT_BASE_TOPIC_RC_RX, id);
     sprintf(mqtt_rc_topic_tx, CLOUD_CFG_MQTT_BASE_TOPIC_RC_TX, id);
+    ESP_LOGI(TAG, "%s", mqtt_rc_topic_rx);
+    ESP_LOGI(TAG, "%s", mqtt_rc_topic_tx);
 
     // sprintf(mqtt_main_topic, "xeleqt/v1/%s", id);
     strcpy(mqtt_main_topic, "xeleqt/v1/user");

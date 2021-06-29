@@ -21,4 +21,6 @@ size_t command_parser_stoggle(char* param, char* out, void* args);
 
 size_t command_parser_soff(char* param, char* out, void* args);
 
+size_t command_parser_ctrl(char* param, char* out, void* args);
+
 #endif /* COMPONENTS_COMMANDS_COMMANDS_PARSER */
