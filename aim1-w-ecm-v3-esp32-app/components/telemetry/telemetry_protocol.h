@@ -45,5 +45,21 @@ typedef struct
     int16_t co2;
 }__attribute__((packed)) telemetry_airparameters_t;
 
+/* To be implemented */
+typedef struct
+{
+    uint8_t type;
+    uint8_t device_type;
+    uint64_t serial;
+    uint32_t timestamp;
+    int16_t voc_index;
+    int16_t temperature;
+    int16_t humidity;
+    int16_t co2;
+    int16_t formaldehyde;
+    int16_t pm2_5;
+    int16_t pm10;
+} __attribute__((packed)) telemetry_airpollutants_t;
+
 
 #endif

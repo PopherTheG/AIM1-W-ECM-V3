@@ -81,7 +81,7 @@ void gui_start_task()
     /* If you want to use a task to create the graphic, you NEED to create a Pinned
     task. Otherwise there can be problem such as memory corruption and so on.
     NOTE: When not using Wi-Fi nor Bluetooth you can pin the guiTask to core 0. */
-    xTaskCreatePinnedToCore(guiTask, "gui", 4096 * 2, NULL, 0, NULL, 1);
+    xTaskCreatePinnedToCore(guiTask, "gui", 4096 * 2, NULL, 10, NULL, 1);
 }
 
 static void guiTask(void *pvParameter)
@@ -409,7 +409,7 @@ void st7899_display_application()
     // lv_obj_align(hum_icon, hum_box, LV_ALIGN_IN_TOP_LEFT, 3, 3);
 
     lv_obj_t *hum_value = lv_label_create(hum_box, NULL);
-    lv_label_set_text(hum_value, "47%");
+    lv_label_set_text(hum_value, "47%%");
     // lv_obj_align(hum_value, hum_box, LV_ALIGN_IN_TOP_LEFT, 35, 0);
     lv_obj_align(hum_value, hum_box, LV_ALIGN_IN_TOP_LEFT, 3, 0);
     static lv_style_t hum_value_style;
@@ -435,7 +435,7 @@ void st7899_display_application()
     lv_style_set_bg_color(&hum_bar_style, LV_STATE_DEFAULT, LV_COLOR_GREEN);
     lv_obj_add_style(hum_bar, LV_BAR_PART_INDIC, &hum_bar_style);
 
-#define SPS30_INSTALLED
+// #define SPS30_INSTALLED
 #ifdef SPS30_INSTALLED
     /* pm2.5 */
     lv_obj_t *pm2_5_box = lv_obj_create(lv_scr_act(), NULL);

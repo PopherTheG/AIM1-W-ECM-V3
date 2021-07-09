@@ -148,15 +148,13 @@ void app_main(void)
 #endif
 
     /* Start task on st7899 display using LVGL library */
-    // gui_start_task();
-
-    
+    gui_start_task();
 
     // /* Used to connect set up the SSID and PASSWORD through a phone */
-    // wifi_manager_start();
+    wifi_manager_start();
     // /* Once internet connection is established. Connect to the cloud
     // with the callback cb_connection_ok */
-    // wifi_manager_set_callback(WM_EVENT_STA_GOT_IP, &cb_connection_ok);
+    wifi_manager_set_callback(WM_EVENT_STA_GOT_IP, &cb_connection_ok);
 
     /* Initializes the Queue for telemetry related events */
     telemetry_init();
@@ -171,10 +169,10 @@ void app_main(void)
     sgp40_voc_index_start_task();
 
     /* Used to connect set up the SSID and PASSWORD through a phone */
-    wifi_manager_start();
+    // wifi_manager_start();
     /* Once internet connection is established. Connect to the cloud
     with the callback cb_connection_ok */
-    wifi_manager_set_callback(WM_EVENT_STA_GOT_IP, &cb_connection_ok);
+    // wifi_manager_set_callback(WM_EVENT_STA_GOT_IP, &cb_connection_ok);
 
     /* Create and start task to run a test on actuating the samsung airconditioner */
     // xTaskCreate(run_all_samsung_test, "samsung ac test", 1024 * 2, NULL, 2, NULL);

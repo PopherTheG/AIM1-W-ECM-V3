@@ -165,7 +165,7 @@ static fix16_t fix16_div(fix16_t a, fix16_t b) {
 
         remainder <<= 1;
         bit >>= 1;
-    }
+        }
 
 #ifndef FIXMATH_NO_ROUNDING
     if (remainder >= divider) {
